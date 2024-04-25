@@ -22,7 +22,7 @@
 <aside class="navbar-aside" id="offcanvas_aside">
     <div class="aside-top">
         <a href="index.html" class="brand-wrap">
-            <img src="admin-assets/imgs/theme/logo.svg" class="logo" alt="PULSE Dashboard">
+            <img src="/public/admin-assets/imgs/watchlogo (1).png" class="logo" alt="PULSE Dashboard">
         </a>
         <div>
             <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -31,13 +31,19 @@
     <nav>
         <ul class="menu-aside">
             <li class="menu-item">
+                <a class="menu-link" href="/admin/home"> <!-- Placeholder link for Users -->
+                    <i class="icon material-icons md-person"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item">
                 <a class="menu-link" href="/admin/userlist"> <!-- Placeholder link for Users -->
                     <i class="icon material-icons md-person"></i>
                     <span class="text">Users</span>
                 </a>
             </li>
             <li class="menu-item">
-                <a class="menu-link" href="/admin/product"> <!-- Placeholder link for Products -->
+                <a class="menu-link" href="/admin/productlist"> <!-- Placeholder link for Products -->
                     <i class="icon material-icons md-shopping_bag"></i>
                     <span class="text">Products</span>
                 </a>
@@ -46,6 +52,18 @@
                 <a class="menu-link" href="/admin/category"> <!-- Placeholder link for Categories -->
                     <i class="icon material-icons md-shopping_bag"></i>
                     <span class="text">Categories</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/order"> <!-- Placeholder link for Categories -->
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/Coupon"> <!-- Placeholder link for Categories -->
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Coupon</span>
                 </a>
             </li>
         </ul>
@@ -116,7 +134,7 @@
                     <p>Whole data about your business here</p>
                 </div>
                 <div>
-                    <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                    <a href="/admin/salesreport " class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
                 </div>
             </div>
             <div class="row">

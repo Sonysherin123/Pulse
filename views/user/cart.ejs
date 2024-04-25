@@ -156,7 +156,7 @@
                                     <li><a href="cart">Cart</a></li>
                                     <li><a href="wishlist">Wishlist</a></li>
                                     <li><a href="orders">Order</a></li>
-                                    <li><a href="landingpage">Logout</a></li>
+                                    <li><a href="logout">Logout</a></li>
 
                                 </ul>
                             </div>
@@ -499,138 +499,73 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% if (cartData && pdtData.length>0  ) { %>
-                                            <% for (let i=0; i < pdtData.length; i++) { %>
+                                        <% if (cartData && cartData.items && cartData.items.length > 0) { %>
+                                            <% cartData.items.forEach((item, i) => { %>
                                                 <tr>
-                                                    <input type="hidden" id="pdtId" name="user_id"
-                                                        value="<%= pdtData[i]._id %>">
-                                                    <td class="plantmore-product-thumbnail"><a href="#"><img
-                                                                src="/productAssets/<%= pdtData[i].images[0] %>"
-                                                                style="height: 80px; width: 80px; object-fit: cover;"
-                                                                alt=""></a>
-                                                        <% if (pdtData[i].countInStock < cartData.items[i].quantity) {
-                                                            %>
-
-                                                            <p class="text-warning" id="onlyStock">We're sorry! Only <%=
-                                                                    pdtData[i].countInStock %> unit(s) are Available !
-                                                            </p>
-                                                            <% } %>
+                                                    <input type="hidden" id="pdtId" name="user_id" value="<%= item.productId._id %>">
+                                                    <td class="plantmore-product-thumbnail"><a href="#"><img src="/uploads/productImages/<%= item.productId.images[0] %>" style="height: 80px; width: 80px; object-fit: cover;" alt=""></a>
+                                                        <% if (item.productId.countInStock < item.quantity) { %>
+                                                            <p class="text-warning" id="onlyStock">We're sorry! Only <%= item.productId.countInStock %> unit(s) are Available !</p>
+                                                        <% } %>
                                                     </td>
-
-                                                    <% if (pdtData[i].countInStock==0) { %>
-                                                        <td class="plantmore-product-name"><a
-                                                                href="/showproduct?id=<%= pdtData[i]._id %>">
-                                                                <%= pdtData[i].pname %>
-                                                            </a></td>
-                                                        <td class="plantmore-product-price">₹<span class="amount"
-                                                                id="price<%= i %>">
-                                                                <%= pdtData[i].offprice %>
-                                                            </span></td>
-                                                        <td>
-                                                            <p class="text-danger" id="ots">Out of Stock</p>
-                                                        </td>
-
+                                                    <% if (item.productId.countInStock == 0) { %>
+                                                        <td class="plantmore-product-name"><a href="/showproduct?id=<%= item.productId._id %>"><%= item.productId.name %></a></td>
+                                                        <td class="plantmore-product-price">₹<span class="amount" id="price<%= i %>"><%= item.productId.price %></span></td>
+                                                        <td><p class="text-danger" id="ots">Out of Stock</p></td>
                                                         <td></td>
-
-                                                        <td hidden class="plantmore-product-quantity"
-                                                            data-title="Stock">
-                                                            <button
-                                                                onclick="increment('<%= pdtData[i]._id %>','1','<%= i %>','<%= pdtData[i].offprice %>','<%= cartData.items[i].subTotal %>')"
-                                                                style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">+</button>
-                                                            <span id="quantity<%= i %>">
-                                                                <%= cartData.items[i].quantity %>
-                                                            </span>
-                                                            <button
-                                                                onclick="decrement('<%= pdtData[i]._id %>','1','<%= i %>','<%= pdtData[i].offprice %>','<%= cartData.items[i].subTotal %>')"
-                                                                style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">-</button>
+                                                        <td class="plantmore-product-remove"><a onclick="remove('<%= item.productId._id %>','<%= i %>')" class="text-muted"><i class="fa fa-trash"></i></a></td>
+                                                    <% } else { %>
+                                                        <td class="plantmore-product-name"><a href="/showproduct?id=<%= item.productId._id %>"><%= item.productId.name %></a></td>
+                                                        <td class="plantmore-product-price">₹<span class="amount" id="price<%= i %>"><%= item.productId.price %></span></td>
+                                                        <td class="plantmore-product-quantity" data-title="Stock">
+                                                            <button onclick="increment('<%= item.productId._id %>','1','<%= i %>')" style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">+</button>
+                                                            <span id="quantity<%= i %>"><%= item.quantity %></span>
+                                                            <button onclick="decrement('<%= item.productId._id %>','1','<%= i %>','<%= item.productId.offprice %>','<%= item.subTotal %>')" style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">-</button>
                                                         </td>
-                                                        <td hidden class="product-subtotal">₹<span class="amount"
-                                                                id="subtotal<%= i %>">
-                                                                <%= cartData.items[i].subTotal %>
-                                                            </span></td>
-
-
-
-                                                        <% } else { %>
-                                                            <td class="plantmore-product-name"><a
-                                                                    href="/showproduct?id=<%= pdtData[i]._id %>">
-                                                                    <%= pdtData[i].pname %>
-                                                                </a></td>
-                                                            <td class="plantmore-product-price">₹<span class="amount"
-                                                                    id="price<%= i %>">
-                                                                    <%= pdtData[i].offprice %>
-                                                                </span></td>
-                                                            <td class="plantmore-product-quantity" data-title="Stock">
-                                                                <button
-                                                                    onclick="increment('<%= pdtData[i]._id %>','1','<%= i %>','<%= pdtData[i].offprice %>','<%= cartData.items[i].subTotal %>')"
-                                                                    style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">+</button>
-                                                                <span id="quantity<%= i %>">
-                                                                    <%= cartData.items[i].quantity %>
-                                                                </span>
-                                                                <button
-                                                                    onclick="decrement('<%= pdtData[i]._id %>','1','<%= i %>','<%= pdtData[i].offprice %>','<%= cartData.items[i].subTotal %>')"
-                                                                    style="background-color: rgb(24, 5, 9);width: 30px; height: 25px; border: none; color: white; ">-</button>
-                                                            </td>
-                                                            <td class="product-subtotal">₹<span class="amount"
-                                                                    id="subtotal<%= i %>">
-                                                                    <%= cartData.items[i].subTotal %>
-                                                                </span></td>
-                                                            <% } %>
-                                                                <td class="plantmore-product-remove"><a
-                                                                        onclick="remove('<%= pdtData[i]._id %>','<%= i %>')"
-                                                                        class="text-muted"><i
-                                                                            class="fa fa-trash"></i></a></td>
+                                                        <td class="product-subtotal">₹<span class="amount" id="subtotal<%= i %>"><%= item.subTotal %></span></td>
+                                                        <td class="plantmore-product-remove"><a onclick="remove('<%= item.productId._id %>','<%= i %>')" class="text-muted"><i class="fa fa-trash"></i></a></td>
+                                                    <% } %>
                                                 </tr>
-                                            <% } %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="6" id="noPro">Cart is Empty.</td>
-                                                    </tr>
-                                                <% } %>
-                                                
-
+                                            <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" id="noPro">Cart is Empty.</td>
+                                            </tr>
+                                        <% } %>
+                                        
+                                        
                                     </tbody>
                                 </table>
                             </div>
                             <div class="row">
-                                <% if (cartData) { %>
+                                <% if (cartData && cartData.items && cartData.items.length > 0) { %>
                                     <div class="col-md-8">
                                         <div class="coupon-all">
                                             <div class="coupon2">
-                                                <input class="submit" name="update_cart" value="Update cart"
-                                                    type="submit">
+                                                <input class="submit" name="update_cart" value="Update cart" type="submit">
                                                 <a href="shop" class=" continue-btn">Continue Shopping</a>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                     <div class="col-md-4 ml-auto">
                                         <div class="cart-page-total">
                                             <h2>Cart totals</h2>
                                             <ul>
-                                                <li>Subtotal ₹<span id="cartSubtotal">
-                                                        <%= cartData.total %>
-                                                    </span></li>
-                                                <li>Total ₹<span id="total">
-                                                        <%= cartData.total %>
-                                                    </span></li>
+                                                <li>Subtotal ₹<span id="cartSubtotal"><%= cartData.total %></span></li>
+                                                <li>Total ₹<span id="total"><%= cartData.total %></span></li>
                                             </ul>
-                                            <% if(cartData.items.length!==0) {%>
-                                                <a onclick="checkOut()" class="proceed-checkout-btn">Proceed to
-                                                    checkout</a>
-                                                <% } %>
+                                            <a href="/checkoutData" class="proceed-checkout-btn">Proceed to checkout</a>
                                         </div>
                                     </div>
-                                    <% } else {%> 
-                                    
-                                        <% } %>
+                                <% } %>
                             </div>
+                            
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-
+        
 
 
 
@@ -787,14 +722,12 @@
 
 
     <script>
-        function increment(pdtId, quantity, index, price, subtotal) {
+        function increment(pdtId, quantity, index) {
 
             let qty = parseInt(document.getElementById("quantity" + index).innerHTML);
             // alert(qty)
             const sbt = document.getElementById("subtotal" + index).innerHTML
-            // alert(sbt,"subtotal")
-            const ttl = document.getElementById("total").innerHTML
-            // alert(ttl,"totaal")
+           
             const prc = document.getElementById("price" + index).innerHTML
             // alert(prc, "price")
 
@@ -804,11 +737,8 @@
                 url: "/cartadd",
                 method: "post",
                 data: {
-                    price,
                     pdtId,
                     qty,
-                    subtotal,
-
                 },
                 success: (response) => {
                     if (response.status == true) {
@@ -823,7 +753,6 @@
                     } else if (response.status == "minimum") {
                         Swal.fire({
                             icon: "error",
-                            // title: "Oops...",
                             text: "We're sorry! Only 5 unit(s) allowed in each order!",
 
                         });
@@ -833,7 +762,7 @@
                         Swal.fire({
                             icon: "error",
                             title: "Oops...",
-                            text: "Out of Stock!",
+                            text: "Maximum!",
 
                         })
 
@@ -932,7 +861,7 @@
                             success: (response) => {
                                 if (response.status == true) {
 
-                                    window.location.href = "http://localhost:8080/cart"
+                                    window.location.href = "/cart"
 
                                     document.getElementById("total").innerHTML = response.total
 
@@ -950,50 +879,6 @@
         }
 
 
-
-
-        function checkOut() {
-    $.ajax({
-        url: "/checkout",
-        method: "get",
-        success: (response) => {
-            if (response.status === "checked") {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Oops...",
-                    text: "Some products in your cart are no longer available or out of stock. Please review your cart.",
-                });
-            } else if (response.status === true) {
-                // Check if the response contains totalPrice
-                if (response.totalPrice !== undefined) {
-                    const cartTotal = parseFloat($("#total").text()); // Current total displayed to the user
-                    const newTotal = parseFloat(response.totalPrice); // Total price calculated by the server
-
-                    if (newTotal !== cartTotal) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Oops...",
-                            text: "Some product prices in your cart have changed. Please review your cart.",
-                        }).then(() => {
-                            location.href = "/cart"; // Redirect the user to the cart page to review changes
-                        });
-                    } else {
-                        location.href = "/checkOutPage"; // Proceed to checkout page
-                    }
-                } else {
-                    location.href = "/checkOutPage"; // Proceed to checkout page
-                }
-            }
-        },
-        error: () => {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "An error occurred while processing your request. Please try again later.",
-            });
-        }
-    });
-}
 
 
 

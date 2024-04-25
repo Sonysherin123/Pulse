@@ -48,6 +48,5 @@ is_deleted:{
 }
 });
 
-const ProductModel = mongoose.model('Products', productSchema)
 
-module.exports = ProductModel;
+module.exports = mongoose.model('Products', productSchema);

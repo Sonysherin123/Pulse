@@ -33,9 +33,6 @@ const addProduct = async (req, res) => {
 
        
         let product={};
-        
-       
-           
        
          product = new productModel({
             name: req.body.name,
@@ -52,7 +49,7 @@ const addProduct = async (req, res) => {
         const savedProduct = await product.save();
 
         if (savedProduct) {
-            return res.redirect('/admin/product');
+            return res.redirect('/admin/productlist');
         } else {
          
             return res.render('product', {  message: 'Error saving product.' });
@@ -67,14 +64,14 @@ const addProduct = async (req, res) => {
 const activeStatus = async (req, res) => {
     try {
         const { id, action } = req.query;
-
-        if (action === 'Inactive') {
+console.log('hi');
+        if (action === 'InActive') {
             await productModel.findByIdAndUpdate({ _id: id }, { is_deleted: false });
         }
         else {
             await productModel.findByIdAndUpdate({ _id: id }, { is_deleted: true });
         }
-        res.redirect('/admin/product')
+        res.redirect('/admin/productlist')
     }
     catch (error) {
         console.log(error.message);
@@ -124,7 +121,7 @@ const editProduct = async (req, res) => {
 
         // Limit images to 3
         if (allImages.length > 3) {
-            return res.render('editProduct', { cate: categorydetails, pro: existingProduct, message: 'Maximum 3 images per product' });
+            return res.render('editproduct', { cate: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
         } else {
             // Update the product with new data
             const updatedProduct = await productModel.findByIdAndUpdate(req.query.id, {
@@ -140,7 +137,7 @@ const editProduct = async (req, res) => {
             }, { new: true }); // {new: true} to return the updated object
 
             if (updatedProduct) {
-                return res.redirect('/admin/product');
+                return res.redirect('/admin/productlist');
             }
         }
     } catch (error) {
@@ -148,8 +145,56 @@ const editProduct = async (req, res) => {
         res.status(500).send('An error occurred');
     }
 };
+const deleteimage = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const del = req.query.delete;
+
+        const product = await productModel.findById(id);
+        console.log(product, del, id);
+
+        if (del) {
+            const index = product.images.indexOf(del);
+            if (index !== -1) {
+                product.images.splice(index, 1);
+                // Save the updated product to the database
+                await product.save();
+            }
+        }
+
+        res.redirect('/admin/edit-pro?id=' + id);
+    } catch (err) {
+        console.log(err.message);
+        // Handle errors appropriately, perhaps send an error response
+        res.status(500).send("Error deleting image");
+    }
+}
+
+const Loadproduct = async(req,res)=>{
+    try{
+        const product =await productModel.find({})
+        res.render('productlist',{pro:product})
 
 
+    }catch(error){
+    console.log(error);
+}
+};
+ const searchProducts = async(req,res)=>{
+    try{
+        const {searchDataValue} = req.body
+        const searchProducts = await Product.find({name:{
+            $regex: searchDataValue , $options: 'i'
+        }})
+        // console.log(searchProducts);
+        res.json({status:"searched",searchProducts})
+  
+    
+
+    }catch(error){
+        console.log(error)
+    }
+ }
 
 
 
@@ -159,5 +204,8 @@ module.exports = {
     addProduct,
     activeStatus,
     loadEdit,
+    deleteimage,
+    Loadproduct,
+    searchProducts
     
 }

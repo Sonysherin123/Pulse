@@ -5,6 +5,9 @@ const {sendInsertOtp}=require('../util/insertotp');
 const ProductModel=require('../model/productmodel');
 const userModel = require('../model/userModel');
 const addressModel = require('../model/addressmodel');
+const cartmodel = require('../model/cartmodel');
+const categoryModel=require('../model/categorymodel');
+const addressmodel = require('../model/addressmodel');
 
 
 // const Address = require('../models/Address'); // Adjust the path as needed
@@ -76,6 +79,7 @@ const insertUser = async (req, res) => {
             console.log(otp,"otp");
             const otpTimestamp = Date.now();
             console.log(otpTimestamp,'time');
+
             // Store user data and OTP in session
             req.session.Data = { name, email, mobileno, userpassword, confirmpassword, otp, otpTimestamp };
             console.log(req.session.Data,"data saved");
@@ -222,7 +226,7 @@ const getOTP=async(req,res)=>{
                         return res.render('OTP',{message: "otp expired"})
                     }
                     else{
-                        return res.render('OTP',{message: "invalid"})
+                        return res.render('OTP',{message: "Otp incorrect"})
 
                     }
                 }
@@ -257,7 +261,7 @@ const loaduserprofile = async(req,res)=>{
     try{
         const userData = await userModel.findById(req.session.user);
         const address = await addressModel.findOne(
-            { 'user': req.session.user }
+            { 'userId': req.session.user }
         );
 
         res.render('userProfile', { userData,address});
@@ -284,27 +288,27 @@ const loaduserprofile = async(req,res)=>{
 
 const addAddress = async (req, res) => {
     try {
-        console.log("heloo      ")
+        console.log("heloo")
         const { addressType, name, city, homeAddress, landMark, state, pincode, phone, altPhone } = req.body;
         console.log( addressType, name, city, homeAddress, landMark, state, pincode, phone, altPhone);
 
-        const existingAddresses = await addressModel.findOne({ userId: req.session.user._id });
+        const existingAddresses = await addressModel.findOne({ userId: req.session.user});
 
-        // if (existingAddresses && existingAddresses.address.length >= 3) {
-        //     req.flash('error', 'You can only have up to 3 addresses.');
-        //     return res.redirect('/userProfile');
-        // }
+        if (existingAddresses && existingAddresses.address.length >= 3) {
+            req.flash('error', 'You can only have up to 3 addresses.');
+            return res.redirect('/userProfile');
+        }
 
-        // if (phone === altPhone) {
-        //     // req.flash('error', 'Phone and Alternate Phone must be different.');
-        //     return res.redirect('/userProfile');
-        // }
+        if (phone === altPhone) {
+            // req.flash('error', 'Phone and Alternate Phone must be different.');
+            return res.redirect('/userProfile');
+        }
 
-        // const pincodeRegex = /^[1-9][0-9]{5}(?:\s[0-9]{3})?$/;
-        // if (!pincodeRegex.test(pincode)) {
-        //     // req.flash('error', 'Pincode must be a 6-digit number.');
-        //     return res.redirect('/userProfile');
-        // }
+        const pincodeRegex = /^[1-9][0-9]{5}(?:\s[0-9]{3})?$/;
+        if (!pincodeRegex.test(pincode)) {
+            // req.flash('error', 'Pincode must be a 6-digit number.');
+            return res.redirect('/userProfile');
+        }
 
         const newAddress = {
             addressType,
@@ -323,7 +327,7 @@ const addAddress = async (req, res) => {
             await existingAddresses.save();
         } else {
             const address = new addressModel({
-                userId: req.session.user._id,
+                userId: req.session.user,
                 address: [newAddress]
             });
             await address.save();
@@ -339,9 +343,9 @@ const addAddress = async (req, res) => {
 const renderEditAddress = async (req, res) => {
     try {
         const addressId = req.query.addressId;
-        const user = req.session.user;
+      
 
-        const address = await Address.findOne({ userId: user._id, 'address._id': addressId });
+        const address = await addressModel.findOne({ userId: req.session.user, 'address._id': addressId });
       
         if (!address) {
             console.log('Address not found');
@@ -350,7 +354,7 @@ const renderEditAddress = async (req, res) => {
 
         const addressData = address.address.find(addr => addr._id.toString() === addressId);
         
-        res.render('editAddress', { address: addressData, addressId: addressId });
+        res.render('editaddress', { address: addressData, addressId: addressId });
 
     } catch (error) {
         console.error(error);
@@ -358,51 +362,11 @@ const renderEditAddress = async (req, res) => {
     }
 };
 
-// const editAddress = async (req, res) => {
-//     try {
-//         const addressId = req.params.addressId;
-//         const { name, addressType, city, homeAddress, landMark, state, pincode, phone, altPhone } = req.body;
-
-//         const updatedAddress = {
-//             name,
-//             addressType,
-//             city,
-//             homeAddress,
-//             landMark,
-//             state,
-//             pincode,
-//             phone,
-//             altPhone
-//         };
-        
-//         const pincodeRegex = /^[1-9][0-9]{5}(?:\s[0-9]{3})?$/;
-//         if (!pincodeRegex.test(pincode)) {
-//             req.flash('error', 'Pincode must be a 6-digit number.');
-//             return res.redirect('/edit-address?addressId=' + addressId);
-//         }
-
-//         const result = await Address.findOneAndUpdate(
-//             { 'address._id': addressId }, 
-//             { $set: { 'address.$': updatedAddress } }, 
-//             { new: true } 
-//         );
-
-//         if (!result) {
-//             console.log('Address not found');
-//             return res.status(404).send('Address not found');
-//         }
-
-//         res.redirect('/userProfile#manageaddress');
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Internal Server Error');
-//     }
-// };
 
 
 const editAddress = async (req, res) => {
     try {
-        const addressId = req.params.addressId;
+        const addressId = req.query.addressId;
         const { name, addressType, city, homeAddress, landMark, state, pincode, phone, altPhone } = req.body;
 
         // Validate pincode format
@@ -426,7 +390,7 @@ const editAddress = async (req, res) => {
         };
         
         // Update the address in the database
-        const result = await Address.findOneAndUpdate(
+        const result = await addressmodel.findOneAndUpdate(
             { 'address._id': addressId }, 
             { $set: { 'address.$': updatedAddress } }, 
             { new: true } 
@@ -451,11 +415,11 @@ const editAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
     try {
-        const addressId = req.params.addressId;
+        const addressId = req.query.addressId;
 
         
-        const address = await Address.findOne({ userId: req.session.user._id });
-
+        const address = await addressmodel.findOne({ userId: req.session.user});
+        console.log('..........afsfsrasfdsd',addressId,);
         
         if (!address) {
             console.log('Address not found');
@@ -479,11 +443,85 @@ const deleteAddress = async (req, res) => {
 
 const loadresetpassword = async(req,res)=>{
 try{
-    res.render('/resetpassword')
+    res.render('resetPassword')
 }catch(error){
     console.log(error);
 }
-}
+};
+// const loadshop = async (req, res) => {
+//     try {
+ 
+//         const product = await ProductModel.find().populate('category');
+
+//         const categories = await categoryModel.find();
+
+//         res.render('shop', { product, categories });
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
+
+const loadshop = async (req, res) => {
+    try {
+        console.log("hai");
+        const product = await ProductModel.find().populate('category');
+        console.log("hello");
+        console.log(product);
+        // Define findWish (assuming it's obtained from somewhere)
+        const findWish = {}; // Example: You should replace this with your actual data
+        const categories = await categoryModel.find();
+        // Assuming sortby and selectedCategory are variables you want to pass to the view
+        const sortby = req.query.sortby || 'all'; // Default value 'all' if not provided in query
+        const selectedCategory = req.query.category || ''; // Default value '' if not provided in query
+
+        res.render('shop', { product, categories, sortby, selectedCategory, findWish });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+const addToWallet=async(req,res)=>{
+    var instance = new Razorpay({
+      key_id: 'rzp_test_ca6f519OHo30qU',
+      key_secret: 'VwPfNUhPxTUpIN8R27IbwWI8',
+    });
+  
+   
+    const amount = Number(req.body.amount);
+    if (!amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid amount provided.",
+      });
+    }
+  
+    var options = {
+      amount: amount * 100,  
+      currency: "INR",
+    };
+  
+  
+    try {
+      const razorpayOrder = await instance.orders.create(options);
+      console.log(razorpayOrder);
+      res.status(201).json({
+        success: true,
+        message: "Wallet updated successfully.",
+        order: razorpayOrder,
+      });
+    } catch (orderError) {
+    
+      console.error('Razorpay Order Creation Error:', orderError);
+      res.status(500).json({
+        success: false,
+        message: "Failed to create order with Razorpay.",
+      });
+    }
+  
+  
+  }
+  
 
 
 
@@ -504,6 +542,10 @@ module.exports = {
     addAddress,
     loadresetpassword,
     editAddress,
-    deleteAddress
+    deleteAddress,
+    renderEditAddress,
+    loadshop,
+    addToWallet
+    
     
 }

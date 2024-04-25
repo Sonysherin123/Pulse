@@ -22,7 +22,8 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="admin-assets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="assets/images/carosal/logo.jpg" class="logo" alt="Evara Dashboard">
+                <h4 style="color: black;">Nail Style</h4>
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -37,15 +38,21 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="products.html"> <!-- Placeholder link for Products -->
+                    <a class="menu-link" href="/admin/product"> <!-- Placeholder link for Products -->
                         <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="categories.html"> <!-- Placeholder link for Categories -->
-                        <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="/admin/category"> <!-- Placeholder link for Categories -->
+                        <i class="icon material-icons md-star"></i>
                         <span class="text">Categories</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/order"> <!-- Placeholder link for orders -->
+                        <i class="icon material-icons md-menu"></i>
+                        <span class="text">Orders</span>
                     </a>
                 </li>
             </ul>
@@ -54,7 +61,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <form class="searchform">
+                <!-- <form class="searchform">
                     <div class="input-group">
                         <input list="search_terms" type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
@@ -65,7 +72,7 @@
                         <option value="Apple iphone">
                         <option value="Ahmed Hassan">
                     </datalist>
-                </form>
+                </form> -->
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
@@ -85,10 +92,10 @@
                     <li class="dropdown nav-item">
                         <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
-                            <a class="dropdown-item text-brand" href="#"><img src="admin-assets/imgs/theme/flag-us.png" alt="English">English</a>
-                            <a class="dropdown-item" href="#"><img src="admin-assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
-                            <a class="dropdown-item" href="#"><img src="admin-assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
-                            <a class="dropdown-item" href="#"><img src="admin-assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                            <a class="dropdown-item text-brand" href="#"><img src="adminassets/imgs/theme/flag-us.png" alt="English">English</a>
+                            <a class="dropdown-item" href="#"><img src="adminassets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                            <a class="dropdown-item" href="#"><img src="adminassets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="#"><img src="adminassets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
                         </div>
                     </li>
                     <li class="dropdown nav-item">
@@ -110,33 +117,38 @@
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Edit Categories </h2>
-                    <p>Add, edit or delete a category</p>
+                    <!-- <p>Add, edit or delete a category</p> -->
                 </div>
                 
                 <div>
-                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
+                    <!-- <input type="text" placeholder="Search Categories" class="form-control bg-white"> -->
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
-                    <form id="categoryForm" method="post"> 
-                        <div class="mb-4">
-                            <label for="product_name" class="form-label">Name</label>
-                            <input type="text" placeholder="Type here" value="<%=category.name%>"  class="form-control" name="name" id="product_name" />
-                            <p id="nameError" class="text-danger"></p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Description</label>
-                            <input placeholder="Type here" value="<%=category.description%>" name="description" id="description" class="form-control"></input>
-                            <p id="descriptionError" class="text-danger"></p>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">edit category</button>
-                        </div>
-                    </form>
-                    <div class="mt-3">
-                        <a href="/admin/category" class="btn btn-secondary">Go Back</a>
-                    </div>
+                    <form action="" method="post" >
+                        <%if(message){%>
+                            <p class="text-danger"><%= message %></p>
+                            <%}%>
+<div class="container p-4 form-group">
+    
+    <h1>Edit category</h1>
+    <input type="text" name="name" placeholder="category name" value="<%=cate.name%>" class="form-control mb-2" required>
+    <br>
+    <br>
+    <input type="text" name="description" placeholder="description" value="<%=cate.description%>" class="form-control mb-2" required>
+    <br><br>
+    <input type="hidden" name="id" value="<%=cate._id%>">
+    <br><br>
+    <button class="btn btn-success rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" type="submit">
+        update 
+    </button>
+    <a class="btn btn-info rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" href="/admin/Category"> Go Back</a>
+    <br><br>
+
+   
+</div>
+</form>
                 </div>
             </div>
             
@@ -165,66 +177,49 @@
     <script src="admin-assets/js/main.js" type="text/javascript"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("categoryForm").addEventListener("submit", async function(e) {
-                e.preventDefault();
-    
-                // Clear previous error messages
-                document.getElementById("nameError").textContent = "";
-                document.getElementById("descriptionError").textContent = "";
-    
-                const nameInput = document.getElementById("product_name").value;
-                const descriptionInput = document.getElementById("description").value;
-    
-                // Validate Name
-                if (nameInput.trim() === "") {
-                    document.getElementById("nameError").textContent = "Name cannot be empty.";
-                    return;
-                }
-    
-                if (!/^[a-zA-Z\s]*$/.test(nameInput) || (/^\s|\s$/.test(nameInput))) {
-                    document.getElementById("nameError").textContent = "Name should only contain letters and spaces.";
-                    return;
-                }
-    
-                if (nameInput.length < 3) {
-                    document.getElementById("nameError").textContent = "Name must be at least 3 characters long.";
-                    return;
-                }
-    
-                // Validate Description
-                if (descriptionInput.trim() === "") {
-                    document.getElementById("descriptionError").textContent = "Description cannot be empty.";
-                    return;
-                }
-    
-                if (descriptionInput.trim().length < 15) {
-                    document.getElementById("descriptionError").textContent = "Description must be at least 15 characters long.";
-                    return;
-                }
-    
-                // Check if the category name already exists
-                const response = await fetch('/check-category', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: nameInput })
-                });
-    
-                const data = await response.json();
-    
-                if (data.exists) {
-                    document.getElementById("nameError").textContent = "Category already exists.";
-                    return;
-                }
-    
-                // If category doesn't exist, submit the form
-                this.submit();
-            });
-        });
+    document.getElementById("categoryForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        // Clear previous error messages
+        document.getElementById("nameError").textContent = "";
+        document.getElementById("descriptionError").textContent = "";
+
+        const nameInput = document.getElementById("product_name").value;
+        const descriptionInput = document.getElementById("description").value;
+
+        // Validate Name
+        if (nameInput.trim() === "") {
+            document.getElementById("nameError").textContent = "Name cannot be empty.";
+            return;
+        }
+
+        if (!/^[a-zA-Z\s]*$/.test(nameInput) || (/^\s|\s$/.test(nameInput)) ) {
+            document.getElementById("nameError").textContent = "Name should only contain letters and spaces.";
+            return;
+        }
+
+        if (nameInput.length < 3) {
+            document.getElementById("nameError").textContent = "Name must be at least 3 characters long.";
+            return;
+        }
+
+        // Validate Description
+        if (descriptionInput.trim() === "") {
+            document.getElementById("descriptionError").textContent = "Description cannot be empty.";
+            return;
+        }
+
+        if (descriptionInput.trim().length < 15) {
+            document.getElementById("descriptionError").textContent = "Description must be at least 70 characters long.";
+            return;
+        }
+
+        // Submit the form if all validations pass
+        this.submit();
+    });
+});
 
     </script>
-
 </body>
 
 </html>

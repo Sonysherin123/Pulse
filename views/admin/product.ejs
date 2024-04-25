@@ -16,6 +16,14 @@
     <link rel="shortcut icon" type="image/x-icon" href="admin-assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="admin-assets/css/main.css" rel="stylesheet" type="text/css" />
+    <style>
+        /* CSS to change text color to black */
+        form label,
+        form p {
+            color: #040303;
+            font-size: 15px;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,13 +40,19 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
+                    <a class="menu-link" href="/admin/home"> <!-- Placeholder link for Users -->
+                        <i class="icon material-icons md-person"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/userlist"> <!-- Placeholder link for Users -->
                         <i class="icon material-icons md-person"></i>
                         <span class="text">Users</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/product"> <!-- Placeholder link for Products -->
+                    <a class="menu-link" href="/admin/productlist"> <!-- Placeholder link for Products -->
                         <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
@@ -115,7 +129,7 @@
                             <h4>Basic</h4>
                         </div>
                         <div class="card-body">
-                            <form method="post" action="" enctype="multipart/form-data"  onsubmit="return validateForm()">
+                            <form method="post" action="" enctype="multipart/form-data" onsubmit="return validateForm()">
                                 <!-- General Information Section -->
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Name</label>
@@ -155,14 +169,14 @@
                             
                                 <!-- Category Section -->
                                 <div class="mb-4">
-                                        <% if(category.length > 0) {
-                                            for(let i=0; i<category.length; i++) { %>
-                                        <label class="mb-2 form-check form-check-inline" style="width: 45%;">
-                                            <input class="form-check-input" value="<%=category[i]._id%>" name="category" id="category_<%= i %>" type="radio">
-                                            <span class="form-check-label"> <%=category[i].name%> </span>
-                                        </label>
-                                        <%}}%>
-                                        <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
+                                    <% if(category.length > 0) {
+                                        for(let i=0; i<category.length; i++) { %>
+                                    <label class="mb-2 form-check form-check-inline" style="width: 45%;">
+                                        <input class="form-check-input" value="<%=category[i]._id%>" name="category" id="category_<%= i %>" type="radio">
+                                        <span class="form-check-label"> <%=category[i].name%> </span>
+                                    </label>
+                                    <%}}%>
+                                    <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
                                 </div>
                             
                                 <!-- Media Section for Images -->
@@ -179,57 +193,10 @@
                                 </div>
                             </form>
                             
-                            
                         </div>
                     </div> <!-- card end// -->
                 </div>
-                <div>
-                    <table class="table table-hover">
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Images</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Discount Price</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                        
-                        <% if(product.length > 0) {
-                            for(let i=0; i<product.length; i++) { %>
-                                <tr>
-                                    <td><%= product[i].name %></td>
-                                    <td><%= product[i].description %></td>
-                                    <td>
-                                        <% product[i].images.forEach(image => { %>
-                                            <img src="../uploads/productImages/<%= image %>" alt="" height="60px" width="60px">
-                                        <% }) %>
-                                    </td>
-                                    <td><%= product[i].category.name %></td>
-                                    <td><%= product[i].price %></td>
-                                    <td><%= product[i].discountPrice %></td>
-                                    <td><%= product[i].countInStock %></td>
-                                    <td><%= product[i].is_deleted ? 'Inactive' : 'Active' %></td> 
-                                    <td>
-                                        <!-- Toggle button to change status -->
-                                        <a href="/admin/active?id=<%= product[i]._id %>&action=<%= product[i].is_deleted ? 'Inactive' : 'Active' %>" class="btn btn-primary">
-                                            <%= product[i].is_deleted ? 'Active' : 'Inactive' %>
-                                        </a>
-                                        <br><br>
-                                        <a href="/admin/editproduct?id=<%= product[i]._id %>" class="btn btn-primary">Edit</a>
-                                    </td>
-                                </tr>
-                            <% }
-                        } else { %>
-                            <tr>
-                                <td colspan="9">Product Not Found</td>
-                            </tr>
-                        <% } %>
-                    </table>
-                    
-                </div>
+    
             </div>
         </section> <!-- content-main end// -->
         <footer class="main-footer font-xs">
@@ -267,6 +234,9 @@
     
         // Attach event listeners to stock count field
         document.getElementById('stock_count').addEventListener('blur', function() {
+            if (stock_count ===0){
+                
+            }
             validateStockCount();
         });
     
