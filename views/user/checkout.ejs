@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Ruiz - Watch Store HTML Template</title>
+    <title>PULSE</title>
     <meta name="robots" content="noindex, follow" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -157,7 +157,7 @@
                                     <li><a href="userProfile">My account</a></li>
                                     <li><a href="cart">Cart</a></li>
                                     <li><a href="wishlist">Wishlist</a></li>
-                                    <li><a href="orders">Order</a></li>
+                                    <li><a href="order">Order</a></li>
                                     <li><a href="landingpage">Logout</a></li>
 
                                 </ul>
@@ -176,7 +176,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-4 col-5">
                             <div class="logo-area">
-                                <a href="home"><img src="assets/images/logo/logo.png" alt=""></a>
+                                <a href="index.html"><img  class="logo_image" src="/assets/images/logo/watch_logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -247,11 +247,11 @@
                                         <li><a href="shop">Shop </a>
 
                                         </li>
-                                        <li><a href="rolex">Rolex </a>
+                                        <li><a href="">MEN </a>
                                           
                                         </li>
-                                        <li><a href="">About Us</a></li>
-                                        <li><a href="">Contact</a></li>
+                                        <li><a href="">WOMEN</a></li>
+                                        <!-- <li><a href="">Contact</a></li> -->
                                     </ul>
                                 </nav>
 
@@ -268,12 +268,12 @@
                             <div class="right-blok-box text-white d-flex">
 
                                 <div class="user-wrap">
-                                    <a href="wishlist.html"><span class="cart-total">2</span> <i
+                                    <a href="wishlist"><span class="cart-total"></span> <i
                                             class="icon-heart"></i></a>
                                 </div>
 
                                 <div class="shopping-cart-wrap">
-                                    <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total">2</span></a>
+                                    <a href="cart"><i class="icon-basket-loaded"></i><span class="cart-total"></span></a>
                                     <ul class="mini-cart">
                                         <li class="cart-item">
                                             <div class="cart-image">
@@ -448,10 +448,10 @@
                             <div class="top-info-wrap text-left text-black">
                                 <h5>My Account</h5>
                                 <ul class="offcanvas-account-container">
-                                    <li><a href="my-account.html">My account</a></li>
-                                    <li><a href="cart.html">Cart</a></li>
-                                    <li><a href="wishlist.html">Wishlist</a></li>
-                                    <li><a href="checkout.html">Checkout</a></li>
+                                    <li><a href="my-account">My account</a></li>
+                                    <li><a href="cart">Cart</a></li>
+                                    <li><a href="wishlist">Wishlist</a></li>
+                                    <li><a href="checkoutData">Checkout</a></li>
                                 </ul>
                             </div>
 
@@ -807,7 +807,8 @@
                                                     style="font-size: 15px; font-weight: 500;">
                                                     <span class="me-3"><i class="bi bi-credit-card"
                                                             style="opacity: 0.5;"></i></span>
-                                                    Razorpay</label>
+                                                </label>
+                                                <label>Razorpay</label>
                                                     
                                                 <%}else{%>
                                                     <p style="margin-left: 40px; font-size: 15px; font-weight: 500;">
@@ -1047,7 +1048,7 @@
             let paymentOption = document.querySelector('input[name="payment_option"]:checked').value
            
             const totalDis = document.getElementById("cartSubtotal").innerHTML
-
+            // alert(paymentOption)
             $.ajax({
                 url: "/checkOutData",
                 method: "post",
@@ -1090,10 +1091,10 @@
                         // alert(couponCode)
                         // alert(order_num)
                         var options = {
-                            "key": "rzp_test_ca6f519OHo30qU",
+                            "key": "rzp_test_xaGkIpXmOWb28y",
                             "amount": response.order.amount,
                             "currency": "INR",
-                            "name": "ChronoChic",
+                            "name": "PULSE",
                             "description": "Test Transaction",
                             "image": "assets/images/logo/cc.png",
                             "order_id": response.order.id,
@@ -1182,7 +1183,7 @@
                             timer: 1500
                         }).then(() => {
                             setTimeout(() => {
-                                window.location.href = `/orders`;
+                                window.location.href = `/order`;
                             }, 1500); 
                         });
                     }
@@ -1296,7 +1297,7 @@
                 icon: "success",
                 title: "Coupon Removed"
             }).then((result) => {
-                window.location.href = "/checkOutPage"
+                window.location.href = "/checkoutData"
             })
 
         }

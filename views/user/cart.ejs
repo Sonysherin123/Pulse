@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Chronochic</title>
+    <title>PULSE</title>
     <meta name="robots" content="noindex, follow" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -155,8 +155,8 @@
                                     <li><a href="userProfile">My account</a></li>
                                     <li><a href="cart">Cart</a></li>
                                     <li><a href="wishlist">Wishlist</a></li>
-                                    <li><a href="orders">Order</a></li>
-                                    <li><a href="logout">Logout</a></li>
+                                    <li><a href="order">Order</a></li>
+                                    <li><a href="/logout">Logout</a></li>
 
                                 </ul>
                             </div>
@@ -174,7 +174,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-4 col-5">
                             <div class="logo-area">
-                                <a href="home"><img src="/public/assets/images/logo/watch_logo.png" alt=""></a>
+                                <a href="index.html"><img  class="logo_image" src="/assets/images/logo/watch_logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -245,11 +245,11 @@
                                         <li><a href="shop">Shop </a>
 
                                         </li>
-                                        <li><a href="rolex">Rolex </a>
+                                        <li><a href="">MEN</a>
                                           
                                         </li>
-                                        <li><a href="">About Us</a></li>
-                                        <li><a href="">Contact</a></li>
+                                        <li><a href="">WOMEN</a></li>
+                                        <!-- <li><a href="">Contact</a></li> -->
                                     </ul>
                                 </nav>
 
@@ -515,6 +515,7 @@
                                                         <td></td>
                                                         <td class="plantmore-product-remove"><a onclick="remove('<%= item.productId._id %>','<%= i %>')" class="text-muted"><i class="fa fa-trash"></i></a></td>
                                                     <% } else { %>
+                                                      
                                                         <td class="plantmore-product-name"><a href="/showproduct?id=<%= item.productId._id %>"><%= item.productId.name %></a></td>
                                                         <td class="plantmore-product-price">₹<span class="amount" id="price<%= i %>"><%= item.productId.price %></span></td>
                                                         <td class="plantmore-product-quantity" data-title="Stock">

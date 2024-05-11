@@ -129,12 +129,22 @@
                             <div class="right-blok-box text-white d-flex">
 
                                 <div class="user-wrap">
-                                    <a href="wishlist"><span class="cart-total">2</span> <i class="icon-heart"></i></a>
+                                    <%if(wishQty){%>
+                                    <a href="wishlist"><span class="cart-total"><%=wishQty%></span> <i class="icon-heart"></i></a>
+                                    <%}else{%>
+                                        <a href="wishlist"><span class="cart-total"></span> <i class="icon-heart"></i></a>
+                                        <%}%>
+
                                 </div>
+                                
 
                                 <div class="shopping-cart-wrap">
-                                    <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total">2</span></a>
-                                    <ul class="mini-cart">
+                                    <%if(cartQty){%>
+                                    <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total"><%=cartQty%></span></a>
+                                    <%}else{%>
+                                        <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total"></span></a>
+                                        <%}%>
+                                    <!-- <ul class="mini-cart">
                                         <li class="cart-item">
                                             <div class="cart-image">
                                                 <a href="product-details.html"><img alt="" src="assets/images/product/product-02.png"></a>
@@ -176,7 +186,7 @@
                                                 <a href="checkout.html">Checkout</a>
                                             </div>
                                         </li>
-                                    </ul>
+                                    </ul> -->
                                 </div>
                             </div>
                         </div>
@@ -213,7 +223,7 @@
                                                         <li><a href="shop-fullwidth.html">Shop Full Width</a></li>
                                                     </ul> -->
                                                 </li>
-                                                <li><a href="#">ALL</a> 
+                                                <!-- <li><a href="#">ALL</a>  -->
                                                     <!-- <ul>
                                                         <li><a href="product-details.html">Single Product Details</a></li>
                                                         <li><a href="variable-product-details.html">Variable Product Details</a></li>
@@ -272,11 +282,14 @@
                                 </div>
 
                                 <div class="shopping-cart-wrap">
-                                    <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total">2</span></a>
+                                    
+                                        <a href="#"><i class="icon-basket-loaded"></i><span class="cart-total">2</span></a>
+                                    
+<!-- 
                                     <ul class="mini-cart">
                                         <li class="cart-item">
                                             <div class="cart-image">
-                                                <a href="product-details.html"><img alt="" src="assets/images/product/product-02.png"></a>
+                                                <a href="product-details"><img alt="" src="assets/images/product/product-02.png"></a>
                                             </div>
                                             <div class="cart-title">
                                                 <a href="product-details.html">
@@ -315,7 +328,7 @@
                                                 <a href="/logout">Logout</a>
                                             </div>
                                         </li>
-                                    </ul>
+                                    </ul> -->
                                 </div>
 
                                 <div class="mobile-menu-btn d-block d-lg-none">
@@ -538,38 +551,42 @@
                         </div>
                     </div>
                 </div>
+                
                
                 <div class="row product-active-lg-4">
                    
                         <!-- single-product-area start -->
                    <%for(let i=0;i<product.length;i++){%>
-                     <div class="col-lg-12">
-                        <div class="single-product-area mt-30">
-                            <div class="product-thumb">
-                                <a href="/productDetails?id=<%=product[i]._id%>">
-                                    <img class="primary-image" width="300px" height="400px" src="/uploads/productImages/<%=product[i].images[0]%>" alt="">
-                                </a>
-                                <div class="label-product label_new">New</div>
-                                <div class="action-links">
-                                    <a  onclick="addCart('<%=product[i]._id%>')" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                    <a  onclick="addtowishlist('<%=product[i]._id%>')"  class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
-                                    <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
+                    <% if(product[i].countInStock>0) {%>
+                        <div class="col-lg-12">
+                            <div class="single-product-area mt-30">
+                                <div class="product-thumb">
+                                    <a href="/productDetails?id=<%=product[i]._id%>">
+                                        <img class="primary-image" style="object-fit:contain;" width="300px" height="350px" src="/uploads/productImages/<%=product[i].images[0]%>" alt="">
+                                    </a>
+                                    <div class="label-product label_new">New</div>
+                                    <div class="action-links">
+                                        <a  onclick="addCart('<%=product[i]._id%>')" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
+                                        <a  onclick="addtowishlist('<%=product[i]._id%>')"  class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                        <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
+                                    </div>
+                                    <ul class="watch-color">
+                                        <li class="twilight"><span></span></li>
+                                        <li class="pigeon"><span></span></li>
+                                        <li  class="portage"><span></span></li>
+                                    </ul>
                                 </div>
-                                <ul class="watch-color">
-                                    <li class="twilight"><span></span></li>
-                                    <li class="pigeon"><span></span></li>
-                                    <li  class="portage"><span></span></li>
-                                </ul>
-                            </div>
-                            <div class="product-caption">
-                                <h4 class="product-name"><a href="/productDetails?id=<%=product[i]._id%>"><%=product[i].name%></a></h4>
-                                <div class="price-box">
-                                    <span class="new-price">Rs.<%=product[i].price%></span>
-                                    <span class="old-price"></span>
+                                <div class="product-caption">
+                                    <h4 class="product-name"><a href="/productDetails?id=<%=product[i]._id%>"><%=product[i].name%></a></h4>
+                                    <div class="price-box">
+                                        <span class="new-price">Rs.<%=product[i].price%></span>
+                                        <span class="old-price"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <%}%>
+                     
                  <%}%>                        <!-- single-product-area end -->
                    
                 </div>
@@ -866,7 +883,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -894,7 +911,7 @@
                                             </a>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -923,7 +940,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -933,7 +950,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 013</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 013</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -962,7 +979,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 015</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 015</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -990,7 +1007,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1000,7 +1017,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 001</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 001</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$44.00</span>
                                                 <span class="old-price">$49.00</span>
@@ -1019,7 +1036,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1047,7 +1064,7 @@
                                             </a>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1057,7 +1074,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$42.00</span>
                                                 <span class="old-price">$45.00</span>
@@ -1086,7 +1103,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1105,7 +1122,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1115,7 +1132,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 008</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 008</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$75.00</span>
                                                 <span class="old-price">$79.00</span>
@@ -1162,7 +1179,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1201,7 +1218,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 011</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 011</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1220,7 +1237,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1243,7 +1260,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-13.png" alt="">
                                             </a>
                                             <div class="action-links">
@@ -1258,7 +1275,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 013</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 013</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1277,7 +1294,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1287,7 +1304,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 013</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 013</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1300,7 +1317,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-15.png" alt="">
                                             </a>
                                             <div class="label-product label_new">New</div>
@@ -1316,7 +1333,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 015</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 015</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1353,7 +1370,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 001</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 001</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$44.00</span>
                                                 <span class="old-price">$49.00</span>
@@ -1382,7 +1399,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 005</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 005</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1400,7 +1417,7 @@
                                             </a>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1410,7 +1427,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-detail">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$42.00</span>
                                                 <span class="old-price">$45.00</span>
@@ -1423,7 +1440,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-07.png" alt="">
                                             </a>
                                             <div class="label-product label_new">New</div>
@@ -1439,7 +1456,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1468,7 +1485,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 008</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 008</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$75.00</span>
                                                 <span class="old-price">$79.00</span>
@@ -1496,7 +1513,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 009</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 009</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$75.00</span>
                                                 <span class="old-price">$79.00</span>
@@ -1515,7 +1532,7 @@
                                             <div class="label-product label_new">New</div>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1525,7 +1542,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 010</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 010</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$65.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1538,7 +1555,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-11.png" alt="">
                                             </a>
                                             <div class="label-product label_new">New</div>
@@ -1554,7 +1571,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 011</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 011</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1583,7 +1600,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 012</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 012</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1601,7 +1618,7 @@
                                             </a>
                                             <div class="action-links">
                                                 <a href="cart" class="cart-btn" title="Add to Cart"><i class="icon-basket-loaded"></i></a>
-                                                <a href="wishlist.html" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
+                                                <a href="wishlist" class="wishlist-btn" title="Add to Wish List"><i class="icon-heart"></i></a>
                                                 <a href="#" class="quick-view" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModalCenter"><i class="icon-magnifier icons"></i></a>
                                             </div>
                                             <ul class="watch-color">
@@ -1624,7 +1641,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-14.png" alt="">
                                             </a>
                                             <div class="label-product label_new">New</div>
@@ -1640,7 +1657,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 013</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 013</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$45.00</span>
                                                 <span class="old-price">$69.00</span>
@@ -1669,7 +1686,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 015</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 015</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1706,7 +1723,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 001</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 001</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$44.00</span>
                                                 <span class="old-price">$49.00</span>
@@ -1735,7 +1752,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 005</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 005</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1748,7 +1765,7 @@
                                     <!-- single-product-area start -->
                                     <div class="single-product-area mt-30">
                                         <div class="product-thumb">
-                                            <a href="product-details.html">
+                                            <a href="product-details">
                                                 <img class="primary-image" src="assets/images/product/product-18.png" alt="">
                                             </a>
                                             <div class="action-links">
@@ -1763,7 +1780,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$42.00</span>
                                                 <span class="old-price">$45.00</span>
@@ -1792,7 +1809,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 004</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 004</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$35.00</span>
                                                 <span class="old-price">$39.00</span>
@@ -1849,7 +1866,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 009</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 009</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$75.00</span>
                                                 <span class="old-price">$79.00</span>
@@ -1878,7 +1895,7 @@
                                             </ul>
                                         </div>
                                         <div class="product-caption">
-                                            <h4 class="product-name"><a href="product-details.html">Simple Product 010</a></h4>
+                                            <h4 class="product-name"><a href="product-details">Simple Product 010</a></h4>
                                             <div class="price-box">
                                                 <span class="new-price">$65.00</span>
                                                 <span class="old-price">$69.00</span>

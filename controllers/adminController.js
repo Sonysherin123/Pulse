@@ -1,10 +1,85 @@
 const userModel = require('../model/userModel');
 const User = require('../model/userModel');
 const Order = require('../model/ordermodel');
-const Product = require('../model/productModel');
+const Product = require('../model/productmodel');
 const bcrypt = require("bcrypt");
-// const { generatePDF } = require('../utils/pdfGenerator');
+const ExcelJS = require('exceljs');
+const Category=require('../model/categorymodel')
 
+const sortDate = async (req, res) => {
+    try {
+      const sort = req.query.value;
+      let orderDateQuery = {};
+  
+      const currentDate = new Date();
+  
+      const currentDateString = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`
+      if (sort === "Day") {
+  
+        orderDateQuery = currentDateString;
+      } else if (sort === "Week") {
+        const firstDayOfWeek = new Date(currentDate);
+        firstDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); 
+        const lastDayOfWeek = new Date(currentDate);
+        lastDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 6); 
+        const firstDayOfWeekString = `${firstDayOfWeek.getDate()}-${firstDayOfWeek.getMonth() + 1}-${firstDayOfWeek.getFullYear()}`;
+        const lastDayOfWeekString = `${lastDayOfWeek.getDate()}-${lastDayOfWeek.getMonth() + 1}-${lastDayOfWeek.getFullYear()}`;
+        orderDateQuery = {
+          $gte: firstDayOfWeekString,
+          $lte: lastDayOfWeekString
+        };
+      } else if (sort === "Month") {
+        orderDateQuery = {
+          $regex: `-${currentDate.getMonth() + 1}-`
+        };
+      } else if (sort === "Year") {
+        orderDateQuery = {
+          $regex: `-${currentDate.getFullYear()}$`
+        };
+      }
+  
+      const order = await Order.find({
+        status: { $nin: ["Ordered", "Canceled", "Shipped"] },
+        orderDate: orderDateQuery
+      }).sort({ _id: -1 });
+  
+  
+      res.render("adminSales", { order });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+const dateFilter = async (req, res) => {
+    try {
+      const date = req.query.value;
+      const date2 = req.query.value1;
+      
+      const parts = date.split("-");
+      const parts1 = date2.split("-");
+  
+      const day = parseInt(parts[2], 10);
+      const day1 = parseInt(parts1[2], 10);
+  
+      const month = parseInt(parts[1], 10);
+      const month1 = parseInt(parts1[1], 10);
+  
+      const rotatedDate = day + "-" + month + "-" + parts[0];
+      const rotatedDate1 = day1 + "-" + month1 + "-" + parts1[0];
+  
+      const order = await Order.find({
+        status: { $in: ["Delivered"] },
+        orderDate: {
+          $gte: rotatedDate,
+          $lte: rotatedDate1
+        }
+      }).sort({ _id: -1 });
+  
+      res.render("adminSales", { order });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
 const loadLogin = async(req,res)=>{
     try{
@@ -21,8 +96,6 @@ const LoadHome = async(req,res)=>{
 
     }
 }
-
-
 const verifyAdmin = async (req, res) => {
     try {
   
@@ -92,8 +165,6 @@ const verifyAdmin = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
   };
-  
-  
   const unblockUser = async (req, res) => {
     try {
         const id = req.query.id;
@@ -134,198 +205,109 @@ const verifyAdmin = async (req, res) => {
 };
 
 
-
-
- async function salesReport(date) {
-    try {
-        const currentDate = new Date();
-        let orders = [];
-        for (let i = 0; i < date; i++) {
-            const startDate = new Date(currentDate);
-            startDate.setDate(currentDate.getDate() - i);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(currentDate);
-            endDate.setDate(currentDate.getDate() - i);
-            endDate.setHours(23, 59, 59, 999);
-
-            const dailyOrders = await Order.find({
-                status: "Delivered",
-                orderDate: {
-                    $gte: startDate,
-                    $lt: endDate,
-                },
-            });
-
-            orders = [...orders, ...dailyOrders];
+const loadSales = async (req, res) => {
+        try {
+          const order = await Order.find({
+            status: { $in: ["Delivered"] },
+      
+          }).sort({ _id: -1 });
+          
+          res.render("adminSales", { order });
+        } catch (error) {
+          console.log(error.message);
         }
+      };
 
-        let productEntered = [];
-        for (let i = 0; i < date; i++) {
-            const startDate = new Date(currentDate);
-            startDate.setDate(currentDate.getDate() - i);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(currentDate);
-            endDate.setDate(currentDate.getDate() - i);
-            endDate.setHours(23, 59, 59, 999);
-
-            const product = await Product.find({
-                createdAt: {
-                    $gte: startDate,
-                    $lt: endDate,
-                },
-            });
-
-            productEntered = [...productEntered, ...product];
+const addOfferLoad=async(req,res)=>{
+        try {
+            const catData = await Category.find({
+                is_active: true });
+                console.log(catData,"catdata");
+            res.render("addOffer",{catData})
+        } catch (error) {
+           console.log(error.message) 
         }
+      }
+      
 
-        let users = await User.countDocuments();
-
-        let totalRevenue = 0;
-        orders.forEach((order) => {
-            totalRevenue += order.totalAmount;
-        });
-
-        let totalOrderCount = await Order.find({
-            status: "Delivered",
-        });
-
-        let Revenue = 0;
-        totalOrderCount.forEach((order) => {
-            Revenue += order.totalAmount;
-        });
-
-        let stock = await Product.find();
-        let totalCountInStock = 0;
-        stock.forEach((product) => {
-            totalCountInStock += product.countInStock;
-        });
-
-        let averageSales = orders.length / date;
-        let averageRevenue = totalRevenue / date;
-
-        return {
-            users,
-            totalOrders: orders.length,
-            totalRevenue,
-            totalOrderCount: totalOrderCount.length,
-            totalCountInStock,
-            averageSales,
-            averageRevenue,
-            Revenue,
-            productEntered: productEntered.length,
-            totalOrder: orders
-        };
-    } catch (err) {
-        console.log('salesreport', err.message);
-        throw err;
-    }
-}
-
-async function salesReportmw(startDate, endDate) {
+const addOffer = async (req, res) => {
     try {
-        let orders = await Order.find({
-            status: "Delivered",
-            orderDate: {
-                $gte: startDate,
-                $lte: endDate,
+      const { discount, startDate, endDate, catname } = req.body;
+  
+      const findCat = await Category.findOne({ name: catname });
+  
+      if (findCat.offer) {
+        const currentDateTime = new Date();
+        const offerEndDate = new Date(findCat.offer.endDate);
+  
+        if (currentDateTime > offerEndDate) {
+          findCat.offer = undefined;
+          await findCat.save();
+        }
+      }
+  
+      const updateCat = await Category.findByIdAndUpdate(
+        { _id: findCat._id },
+        {
+          $set: {
+            offer: {
+              discount: discount,
+              startDate: startDate,
+              endDate: endDate,
             },
-        });
-
-        let productEntered = await Product.find({
-            createdAt: {
-                $gte: startDate,
-                $lte: endDate,
-            },
-        });
-
-        let usersCount = await User.countDocuments();
-
-        let totalRevenue = orders.reduce((total, order) => total + order.totalAmount, 0);
-
-        let totalOrderCount = orders.length;
-
-        let stock = await Product.find();
-        let totalCountInStock = stock.reduce((total, product) => total + product.countInStock, 0);
-
-        let daysInRange = (endDate - startDate) / (1000 * 60 * 60 * 24);
-        let averageSales = totalOrderCount / daysInRange;
-        let averageRevenue = totalRevenue / daysInRange;
-
-        return {
-            usersCount,
-            totalOrders: totalOrderCount,
-            totalRevenue,
-            totalCountInStock,
-            averageSales,
-            averageRevenue,
-            productEntered: productEntered.length,
-            totalOrder: orders
-        };
-    } catch (err) {
-        console.error('salesReport error', err.message);
-        throw err;
-    }
-}
-
-const getWeeksInMonth = (currentDate) => {
-    // Implementation of getWeeksInMonth function
-};
-
-const getMonthsInYear = (currentMonth) => {
-    // Implementation of getMonthsInYear function
-};
-
-function getMonthName(month) {
-    // Implementation of getMonthName function
-}
-
-const pdf = async (req, res) => {
-    try {
-        let title = "";
-        const currentDate = new Date();
-
-        switch (req.query.type) {
-            case 'daily':
-                let dailySalesData = await salesReport(1);
-                generatePDF([dailySalesData], "Daily Sales Report", res);
-                break;
-            case 'weekly':
-                let weeklySalesData = [];
-                const weeks = getWeeksInMonth(currentDate);
-                for (const week of weeks) {
-                    const data = await salesReportmw(week.start, week.end);
-                    weeklySalesData.push({ ...data, period: `Week ${weeks.indexOf(week) + 1}, ${getMonthName(currentDate.getMonth())}` });
-                }
-                generatePDF(weeklySalesData, "Weekly Sales Report", res);
-                break;
-            case 'monthly':
-                let monthlySalesData = [];
-                const months = getMonthsInYear(currentDate.getMonth());
-                for (const { month, year } of months) {
-                    const monthStart = new Date(year, month, 1);
-                    const monthEnd = new Date(year, month + 1, 0);
-                    const data = await salesReportmw(monthStart, monthEnd);
-                    monthlySalesData.push({ ...data, period: `${getMonthName(month)} ${currentDate.getFullYear()}` });
-                }
-                generatePDF(monthlySalesData, "Monthly Sales Report", res);
-                break;
-            case 'yearly':
-                let yearlySalesData = [await salesReport(365)];
-                generatePDF(yearlySalesData, "Yearly Sales Report", res);
-                break;
-            default:
-                res.status(400).send('Invalid report type specified.');
-                return;
+          },
         }
+      );
+  
+      res.json({ status: true });
     } catch (error) {
-        console.error('Error generating PDF:', error.message);
-        res.status(500).send('Error generating PDF.');
+      console.log(error.message);
+      res.status(500).json({ status: false, error: error.message });
     }
-};
+  };
+  const loadCategoryOffer = async (req, res) => {
+    try {
+      // Find all categories that are not blocked
+      const findCat = await Category.find({ is_active: true });
+  
+      // Loop through each category
+      for (let i = 0; i < findCat.length; i++) {
+        // Check if the category has an offer and if the offer has expired
+        if (findCat[i].offer && new Date(findCat[i].offer.endDate) < new Date()) {
+          // If offer has expired, remove the offer from the category and save it
+          findCat[i].offer = undefined;
+          await findCat[i].save();
+        }
+      }
+  
+      
+      res.render("offerCategory", { findCat });
+    } catch (error) {
+      
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+  
 
+const deleteOffer=async(req,res)=>{
+  try {
+    console.log('hi');
+      const id=req.body.id
+      const findCat=await Category.findByIdAndUpdate({_id:id},{
+          $unset:{offer:""}
+      })
 
-
-
+      res.json({status:true})
+  } catch (error) {
+      console.log(error.message)
+  }
+}
+  
+  
+      
+      
 
 module.exports = {
     loadLogin,
@@ -335,8 +317,12 @@ module.exports = {
     blockUser,
     unblockUser,
     listUser,
-    salesReport,
-    pdf
-    
+    loadSales,
+    dateFilter,
+    sortDate,
+    addOfferLoad,
+    addOffer,
+    loadCategoryOffer,
+    deleteOffer
 
 }

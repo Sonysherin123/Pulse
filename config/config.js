@@ -1,8 +1,8 @@
 const sessionSecret = "mysitesessionsecret";
+require('dotenv').config()
 
-const emailUser = "pulsewatchesonline@gmail.com";
-const emailPassword = "vcah jvvq zgfn kqzd";
-
+const  emailUser = process.env.emailUser;
+const emailPassword = process.env.emailPassword;
 module.exports = {
     sessionSecret,
     emailUser,

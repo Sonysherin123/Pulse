@@ -17,7 +17,17 @@ const categorySchema = new mongoose.Schema({
     is_active:{
         type:Boolean,
         default:true
-    }
+    },offer: {
+        discount:{
+            type:Number
+        },
+        startDate:{
+            type:String,
+        },
+        endDate:{
+            type:String
+        },
+    },
 });
 
 module.exports = mongoose.model('category',categorySchema);

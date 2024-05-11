@@ -1,11 +1,12 @@
-const productModel = require("../model/productmodel");
+// const productModel = require("../model/productmodel");
+const Product = require('../model/productmodel');
 const categoryModel = require('../model/categorymodel');
 const userModel = require('../model/userModel');
 
 const loadProduct = async (req, res) => {
     try {
 
-        const productdetails = await productModel.find({}).populate('category');
+        const productdetails = await Product.find({}).populate('category');
         const categorydetails = await categoryModel.find();
         console.log(productdetails,"detailspdt");
         res.render('product', { product: productdetails, category: categorydetails, message: null });
@@ -34,7 +35,7 @@ const addProduct = async (req, res) => {
        
         let product={};
        
-         product = new productModel({
+         product = new Product({
             name: req.body.name,
             description: req.body.description,
             images: images,
@@ -61,15 +62,18 @@ const addProduct = async (req, res) => {
     }
 };
 
+
+
+
 const activeStatus = async (req, res) => {
     try {
         const { id, action } = req.query;
 console.log('hi');
         if (action === 'InActive') {
-            await productModel.findByIdAndUpdate({ _id: id }, { is_deleted: false });
+            await Product.findByIdAndUpdate({ _id: id }, { is_deleted: false });
         }
         else {
-            await productModel.findByIdAndUpdate({ _id: id }, { is_deleted: true });
+            await Product.findByIdAndUpdate({ _id: id }, { is_deleted: true });
         }
         res.redirect('/admin/productlist')
     }
@@ -85,7 +89,7 @@ const loadEdit = async (req, res) => {
         const id = req.query.id;
 
         // Retrieve the product data using the Product model
-        const proData = await productModel.findById(id);
+        const proData = await Product.findById(id);
 
         // Retrieve the category data using the Category model
         const catData = await categoryModel.find({});
@@ -102,29 +106,38 @@ const loadEdit = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
 
+        console.log("edddiittt ooooooooooooooooooooooooooooo")
+
         let existingImages = [];
-        const existingProduct = await productModel.findById(req.query.id);
+        const existingProduct = await Product.findById(req.query.id);
+        console.log(existingProduct,'xxxxxxxxxxxxxdxdrdr');
         const categorydetails = await categoryModel.find();
+        console.log(categorydetails,'ccccccccccccccccccccccccccccccccccccccccccccccccccccccc');
 
         // Existing images are retained unless new images are uploaded
         if (existingProduct && existingProduct.images && Array.isArray(existingProduct.images)) {
             existingImages = existingProduct.images;
         }
-        console.log(req.body);
+        console.log(req.body,'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+        console.log(existingImages,"exxxxxxxxisintftftfcfcfrcft");
         let newImages = [];
         // Process new images if any
         if (req.files && req.files.length) {
             newImages = req.files.map(file => file.filename);
         }
 
+        console.log(newImages,"newwwwwwimage");
+
         const allImages = existingImages.concat(newImages);
+        console.log(allImages,"alllllimage");
 
         // Limit images to 3
-        if (allImages.length > 3) {
-            return res.render('editproduct', { cate: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
+        if (newImages.length !==0) {
+            return res.render('editproduct', { catData: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
         } else {
+            console.log("else workinggg");
             // Update the product with new data
-            const updatedProduct = await productModel.findByIdAndUpdate(req.query.id, {
+            const updatedProduct = await Product.findByIdAndUpdate(req.query.id, {
                 $set: {
                     name: req.body.name,
                     description: req.body.description,
@@ -137,6 +150,7 @@ const editProduct = async (req, res) => {
             }, { new: true }); // {new: true} to return the updated object
 
             if (updatedProduct) {
+                console.log("update product");
                 return res.redirect('/admin/productlist');
             }
         }
@@ -150,7 +164,7 @@ const deleteimage = async (req, res) => {
         const id = req.query.id;
         const del = req.query.delete;
 
-        const product = await productModel.findById(id);
+        const product = await Product.findById(id);
         console.log(product, del, id);
 
         if (del) {
@@ -172,7 +186,7 @@ const deleteimage = async (req, res) => {
 
 const Loadproduct = async(req,res)=>{
     try{
-        const product =await productModel.find({})
+        const product =await Product.find({})
         res.render('productlist',{pro:product})
 
 

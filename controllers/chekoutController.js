@@ -1,5 +1,6 @@
 const User = require("../model/userModel");
-const Product = require("../model/productmodel");
+// const Product = require("../model/productmodel");
+const  Product= require('../model/productmodel');
 const Cart = require("../model/cartmodel");
 const Address = require("../model/addressmodel");
 const categoryModel=require("../model/categorymodel")
@@ -13,139 +14,111 @@ const generateDate = require("../util/dategenerater");
 
 
 var instance = new Razorpay({
-  key_id: 'rzp_test_ca6f519OHo30qU',
-  key_secret: 'VwPfNUhPxTUpIN8R27IbwWI8',
+  key_id: 'rzp_test_xaGkIpXmOWb28y',
+  key_secret: '7l3JbQrUmZdZ8tocVjWSV07y',
 });
 
 
 const loadCheckOutPage = async (req, res) => {
-    try {
-       
-        const userData = await User.findOne({ _id: req.session.user });
-   
-        const cartData = await Cart.findOne({ userId: userData._id }).populate({path:'items.productId',model:'Product'});
+  try {
+      const userData = await User.findOne({ _id: req.session.user });
+ 
+      const cartData = await Cart.findOne({ userId: userData._id }).populate({path:'items.productId',model:'products'});
 
-        if (!cartData) {
-            return res.status(404).json({ error: "Cart not found" });
-        }
-  
+      if (!cartData) {
+          return res.status(404).json({ error: "Cart not found" });
+      }
 
-        const cartItems = cartData.items;
-        
-        const address = await Address.find({ userId: userData._id });
+      // Filter out-of-stock items
+      const cartItems = cartData.items.filter(item => item.productId.countInStock >= 0);
+      
+      const address = await Address.find({ userId: userData._id });
 
-        res.render("checkout", {cartItems, cartData, address});
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ error: error.message });
-    }
+      res.render("checkout", { cartItems, cartData, address });
+  } catch (error) {
+      console.log(error.message);
+      res.status(500).json({ error: error.message });
+  }
 };
 
+
+
 const razopayment = async (req, res) => {
-    try {
-  
-      
-      const { payment, order, addressId, order_num, amount, couponCode, index } = req.body;
-      const findCoupon = await coupon.findOne({ couponCode: couponCode })
-  
-  
-      let hmac = crypto.createHmac("sha256", 'VwPfNUhPxTUpIN8R27IbwWI8');
-  
-      hmac.update(payment.razorpay_order_id + "|" + payment.razorpay_payment_id);
-      hmac = hmac.digest("hex");
-  
-      if (hmac == payment.razorpay_signature) {
-        const userData = await User.findById(req.session.user);
-        const cartData = await Cart.findOne({ userId: userData._id });
-  
-        const pdtData = [];
-  
-        for (let i = 0; i < cartData.items.length; i++) {
-          pdtData.push(cartData.items[i]);
-        }
-  
-  
-        for (const item of cartData.items) {
-          const product = await Product.findById(item.productId);
-          product.countInStock -= item.quantity; // Reduce countInStock by the ordered quantity
-          await product.save();
-        }
-  
-        const orderNum = generateOrder.generateOrder();
-  
-        const addressData = await Address.findOne({ "address._id": addressId });
-  
-        let address = addressData.address[index]
-  
-        const date = generateDate()
-  
-        if (findCoupon) {
-          const orderData = new Order({
-            userId: userData._id,
-            orderNumber: orderNum,
-            userEmail: userData.email,
-            items: pdtData,
-            totalAmount: amount,
-            orderType: "Razorpay",
-            orderDate: date,
-            status: "Processing",
-            shippingAddress: address,
-            coupon: findCoupon.couponCode,
-            discount: findCoupon.discount
-          });
-  
-          const orderdatasave = await orderData.save();
-  
-          const updateCoupon = await coupon.findByIdAndUpdate({ _id: findCoupon._id },
-            {
-              $push: {
-                users: userData._id
-              }
-            })
-  
-          res.json({ status: true, order: orderData });
-          await Cart.findByIdAndDelete({ _id: cartData._id });
-  
-        }
-        else {
-          const orderData = new Order({
-            userId: userData._id,
-            orderNumber: orderNum,
-            userEmail: userData.email,
-            items: pdtData,
-            totalAmount: amount,
-            orderType: "Razorpay",
-            orderDate: date,
-            status: "Processing",
-            shippingAddress: address,
-  
-          });
-  
-  
-          const orderdatawithout = await orderData.save();
-  
-          res.json({ status: true, order: orderData });
-          await Cart.findByIdAndDelete({ _id: cartData._id });
-        }
-  
+  try {
+    const { payment, order, addressId, order_num, amount, couponCode, index } = req.body;
+    console.log(req.body);
+    const findCoupon = await coupon.findOne({ couponCode: couponCode });
+
+    let hmac = crypto.createHmac("sha256", '7l3JbQrUmZdZ8tocVjWSV07y');
+    hmac.update(payment.razorpay_order_id + "|" + payment.razorpay_payment_id);
+    hmac = hmac.digest("hex");
+
+    if (hmac == payment.razorpay_signature) {
+      const userData = await User.findById(req.session.user);
+      const cartData = await Cart.findOne({ userId: userData._id });
+
+      const pdtData = cartData.items;
+
+      for (const item of pdtData) {
+        const product = await Product.findById(item.productId);
+        product.countInStock -= item.quantity;
+        await product.save();
       }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+
+      const orderNum = generateOrder.generateOrder();
+      const addressData = await Address.findOne({ "address._id": addressId });
+      let address = addressData.address[index];
+      const date = generateDate();
+
+      let orderData;
+      if (findCoupon) {
+        orderData = new Order({
+          userId: userData._id,
+          orderNumber: orderNum,
+          userEmail: userData.email,
+          items: pdtData,
+          totalAmount: amount,
+          orderType: "Razorpay",
+          orderDate: date,
+          status: "Processing", // Initial status
+          shippingAddress: address,
+          coupon: findCoupon.couponCode,
+          discount: findCoupon.discount
+        });
+      } else {
+        orderData = new Order({
+          userId: userData._id,
+          orderNumber: orderNum,
+          userEmail: userData.email,
+          items: pdtData,
+          totalAmount: amount,
+          orderType: "Razorpay",
+          orderDate: date,
+          status: "Processing", // Initial status
+          shippingAddress: address
+        });
+      }
+
+      const savedOrder = await orderData.save();
+      await Cart.findByIdAndDelete(cartData._id);
+
+      res.json({ status: true, order: savedOrder });
+    } 
+    // else {
+    //   res.status(400).json({ error: "Razorpay signature verification failed." });
+    // }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
 
   
 const loadWallet = async (req, res) => {
   try {
-    const userData = await User.findById(req.session.user);
-    const userWallet = await Wallet.findOne({ userId: userData._id });
-    if (userWallet && userWallet.transactions) {
-      userWallet.transactions.sort((a, b) => {
-        const dateA = new Date(a.date.split('-').reverse().join('-'));
-        const dateB = new Date(b.date.split('-').reverse().join('-'));
-        return dateB - dateA;
-      });
-    }
+    console.log(req.session.user);
+    const userWallet = await Wallet.findOne({ userId: req.session.user });
+    console.log('.......',userWallet);
     res.render("wallet", { userWallet })
   }
   catch (error) {

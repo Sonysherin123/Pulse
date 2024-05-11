@@ -49,4 +49,4 @@ is_deleted:{
 });
 
 
-module.exports = mongoose.model('Products', productSchema);
+module.exports = mongoose.model('products', productSchema);

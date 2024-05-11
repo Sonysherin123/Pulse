@@ -1,12 +1,14 @@
 const User = require("../model/userModel");
-const Product = require("../model/productmodel");
+
+const Product = require('../model/productmodel');
 const Cart = require("../model/cartmodel");
 const Address = require("../model/addressmodel");
 const categoryModel=require("../model/categorymodel")
 const order=require("../model/ordermodel");
 const generateOrder = require("../util/otphandle");
 const generateDate = require("../util/dategenerater");
-
+const Wallet=require('../model/walletmodel');
+const walletmodel = require("../model/walletmodel");
 
 const loadadminorder=async(req,res)=>{
     try {
@@ -56,7 +58,7 @@ const loadViewOrder = async (req, res) => {
   
       const orderDateParts = findOrder.orderDate.split('-');
       const orderDay = parseInt(orderDateParts[0], 10);
-      const orderMonth = parseInt(orderDateParts[1], 10) - 1; // Months are zero-based in JavaScript
+      const orderMonth = parseInt(orderDateParts[1], 10) - 1; 
       const orderYear = parseInt(orderDateParts[2], 10);
       const orderDate = new Date(orderYear, orderMonth, orderDay);
   
@@ -106,42 +108,225 @@ const loadViewOrder = async (req, res) => {
     }
 }
   
+
+   
+
+// const cancelOrder = async (req, res) => {
+//   try {
+//     const orderId = req.body.id;
+
+    
+//     const findOrder = await order.findById(orderId);
+    
+    
+//     if (findOrder) {
+      
+//       const updateOrder = await order.findByIdAndUpdate(orderId, { $set: { status: "Canceled" } }, { new: true });
+      
+//       if (updateOrder) {
+        
+//         const paymentAmount = findOrder.amount; 
+        
+        
+//         let wallet = await Wallet.findOne({ userId: findOrder.userId });
+//         if (!wallet) {
+          
+//           wallet = new Wallet({ userId: findOrder.userId, balance: paymentAmount });
+//           await wallet.save();
+//         } else {
+          
+//           wallet.balance += paymentAmount;
+//           await wallet.save();
+//         }
+
+        
+//         const transaction = {
+//           date: new Date(),
+//           amount: paymentAmount,
+//           orderType: findOrder.orderType,
+//           type: "Credit" 
+//         };
+//         wallet.transactions.push(transaction);
+//         await wallet.save();
+
+        
+//         return res.json({ status: true });
+//       } else {
+        
+//         return res.status(400).json({ error: "Failed to cancel order. Please try again later." });
+//       }
+//     } else {
+      
+//       return res.status(404).json({ error: "Order not found." });
+//     }
+//   } catch (error) {
+    
+//     console.error(error);
+//     return res.status(500).json({ error: "Internal server error." });
+//   }
+// };
+
+
+// const cancelOrder = async (req, res) => {
+//     try {
+//         const orderId = req.body.id;
+//         const findOrder = await order.findById(orderId);
+
+//         if (!findOrder) {
+//             return res.status(404).json({ error: "Order not found." });
+//         }
+
+//         const updateOrder = await order.findByIdAndUpdate(orderId, { $set: { status: "Canceled" } }, { new: true });
+
+//         if (!updateOrder) {
+//             return res.status(400).json({ error: "Failed to cancel order. Please try again later." });
+//         }
+
+//         const paymentAmount = findOrder.amount;
+
+//         let wallet = await Wallet.findOne({ userId: findOrder.userId });
+
+//         if (!wallet) {
+//             wallet = new Wallet({ userId: findOrder.userId });
+//         }
+
+//         wallet.balance += paymentAmount;
+//         const transaction = {
+//             amount: paymentAmount,
+//             orderType: findOrder.orderType,
+//             type: "Credit"
+//         };
+
+//         wallet.transactions.push(transaction);
+//         await wallet.save();
+
+//         return res.json({ status: true });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ error: "Internal server error." });
+//     }
+// };
+
+function generateTransactionId() {
+  let numbers = '1234567890'; // String containing numbers
+  let id = '';
+  
+  // Generate a 10-digit random ID by selecting random numbers from the string
+  for (let i = 0; i < 10; i++) {
+    id += numbers.charAt(Math.floor(Math.random() * numbers.length));
+  }
+
+  // Convert the generated ID from string to integer
+  return parseInt(id, 10);
+}
+
+
+
 const cancelOrder = async (req, res) => {
   try {
-    const orderId = req.body.id;
-
-    if (!orderId) {
-      return res.status(400).json({ message: 'Order ID is required' });
-    }
-
-    const findOrder = await order.findById(orderId);
+    console.log("inside cancel order lllllllll");
+    const id = req.body.id;
+    const findOrder = await order.findById(id);
+    console.log(findOrder,"order")
 
     if (!findOrder) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ error: "Order not found." });
     }
 
-   
-    await order.findByIdAndUpdate(orderId, {
-      $set: {
-        status: "Canceled"
-      }
-    });
-
-   
+    // Cancel order and update product counts
+    await order.findByIdAndUpdate(id, { $set: { status: "Canceled" } });
     for (const item of findOrder.items) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: {
-          countInStock: item.quantity
-        }
-      });
+      await Product.findByIdAndUpdate(item.productId, { $inc: { countInStock: item.quantity } });
     }
 
-    res.json({ message: 'Order canceled successfully' });
+    // Handle refunds for Razorpay payments
+    if (findOrder.orderType === "Razorpay") {
+      console.log("rezorpay")
+      const findUser = await User.findById({_id :req.session.user}); // Assuming user is stored in session
+      const date = new Date(); 
+      const transactionId = generateTransactionId(); 
+      // You need to define generateTransactionId function
+
+      const userWallet = await Wallet.findOne({ userId: findUser._id });
+
+      if (userWallet) {
+        console.log("if working");
+        // Update existing wallet
+        await Wallet.findByIdAndUpdate(userWallet._id, {
+          $inc: { balance: findOrder.totalAmount },
+          $push: {
+            transactions: {
+              id: transactionId,
+              date: date,
+              amount: findOrder.totalAmount,
+              orderType: 'Razorpay',
+              type: 'Credit'
+            }
+          }
+        });
+      } else {
+        console.log("else working");
+        // Create new wallet for the user
+        const newWallet = new Wallet({
+          userId: findUser._id,
+          balance: findOrder.totalAmount,
+          transactions: [{
+            id: transactionId,
+            date: date,
+            amount: findOrder.totalAmount,
+            orderType: 'Razorpay',
+            type: 'Credit'
+          }]
+        });
+        await newWallet.save();
+      }
+    }
+
+    return res.json({ status: true });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error." });
   }
 };
+
+
+
+
+
+
+
+
+
+
+    
+//     if (findOrder) {
+//       // Update order status based on order type
+//       let updateOrder;
+//       if (findOrder.orderType === "Cash on Delivery" || findOrder.orderType === "Razorpay") {
+//         updateOrder = await order.findByIdAndUpdate(id, { $set: { status: "Canceled" } }, { new: true });
+//       }
+      
+//       // If order status updated successfully
+//       if (updateOrder) {
+//         // Logic for refunding stock or updating wallet goes here
+//         // ...
+        
+//         // Respond with success status
+//         return res.json({ status: true });
+//       } else {
+//         // If order status update failed
+//         return res.status(400).json({ error: "Failed to cancel order. Please try again later." });
+//       }
+//     } else {
+//       // If order document not found
+//       return res.status(404).json({ error: "Order not found." });
+//     }
+//   } catch (error) {
+//     // Handle any errors
+//     console.log(error.message);
+//     return res.status(500).json({ error: "Internal server error." });
+//   }
+// };
 
 
 const loadOrderDetail = async (req, res) => {
@@ -195,109 +380,61 @@ const loadOrderDetail = async (req, res) => {
 
 
 
-// const saveOrder = async (req, res) => {
-//           try {
+const saveOrder = async (req, res) => {
+          try {
         
-//             const { status, id } = req.body
+            const { status, id } = req.body
         
-//             console.log(id, status)
+            console.log(id, status)
         
-//             const checking = await order.findById({ _id: id })
-//             console.log(checking, "checking sts in orderr");
-//             if (checking.status == status) {
-//               res.json({ status: "notChanged" })
-//             } else {
-//               const updateStatus = await order.findByIdAndUpdate({ _id: id }, {
-//                 $set: {
-//                   status: status
-//                 }
-//               })
+            const checking = await order.findById({ _id: id })
+            console.log(checking, "checking sts in orderr");
+            if (checking.status == status) {
+              res.json({ status: "notChanged" })
+            } else {
+              const updateStatus = await order.findByIdAndUpdate({ _id: id }, {
+                $set: {
+                  status: status
+                }
+              })
         
-//             }
-//             if (status == "Returned") {
-//               console.log("entered sts== returned");
+            }
+            if (status == "Returned") {
+              console.log("entered sts== returned");
         
-//               const findOrder = await order.findById({ _id: id })
-//               console.log(findOrder, "orderfinded in return ullilll");
-//               const demo=findOrder.orderType
-//               console.log(demo)
-//               if (findOrder.orderType == "Cash On Delivery") {
-//                 console.log("entered cod for return");
-//                 const date = generateDate();
-//                 const Tid = generateOrder.generateOrder();
+              const findOrder = await order.findById({ _id: id })
+              console.log(findOrder, "orderfinded in return ullilll");
+              const demo=findOrder.orderType
+              console.log(demo)
+              if (findOrder.orderType == "Cash On Delivery") {
+                console.log("entered cod for return");
+                const date = generateDate();
+                const Tid = generateOrder.generateOrder();
         
-//                 const pdtId = [];
+                const pdtId = [];
         
-//                 for (let i = 0; i < checking.items.length; i++) {
-//                   pdtId.push(checking.items[i].productId);
-//                 }
+                for (let i = 0; i < checking.items.length; i++) {
+                  pdtId.push(checking.items[i].productId);
+                }
         
-//                 for (let i = 0; i < pdtId.length; i++) {
-//                   await Product.findByIdAndUpdate(
-//                     { _id: pdtId[i] },
-//                     {
-//                       $inc: {
-//                         countInStock: checking.items[i].quantity,
-//                       },
-//                     }
-//                   );
-//                 }
-//               }
-//             }
-//           }
-//           catch (error) {
-//             console.log(error.message)
-//           }
-//         }
-// const userInWallet = await Wallet.findOne({ userId: findUser._id })
-        
-//               console.log(userInWallet)
-        
-//               if (userInWallet) {
-//                 console.log("inside userWallet")
-//                 const updateWallet = await Wallet.findOneAndUpdate({ userId: findUser._id },
-//                   {
-//                     $inc: {
-//                       balance: findOrder.totalAmount
-//                     },
-//                     $push: {
-//                       transactions: {
-//                         id: Tid,
-//                         date: date,
-//                         amount: findOrder.totalAmount,
-//                         orderType: 'Razorpay',
-//                         type: 'Credit'
-                       
-        
-//                       }
-//                     }
-//                   })
-//               } else {
-//                 console.log("else worked");
-//                 const createWallet = new Wallet({
-//                   userId: findUser._id,
-//                   balance: findOrder.totalAmount,
-//                   transactions: [{
-//                     id: Tid,
-//                     date: date,
-//                     amount: findOrder.totalAmount,
-//                     orderType: 'Razorpay',
-//                     type: 'Credit'
-                    
-        
-//                   }]
-//                 })
-        
-//                 await createWallet.save()
-//               }
-          
-        
-        
-        
-//             res.json({ status: true })
-        
-        
-          
+                for (let i = 0; i < pdtId.length; i++) {
+                  await Product.findByIdAndUpdate(
+                    { _id: pdtId[i] },
+                    {
+                      $inc: {
+                        countInStock: checking.items[i].quantity,
+                      },
+                    }
+                  );
+                }
+              }
+            }
+          }
+          catch (error) {
+            console.log(error.message)
+          }
+        }
+
           
         
         
@@ -315,7 +452,7 @@ module.exports = {
   orders,
   cancelOrder,
   loadOrderDetail,
-  //saveOrder,
-  //cancelOrder
+  saveOrder,
+  cancelOrder
 
 };

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>PULSE Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -130,25 +130,25 @@
                         <%if(message){%>
                             <p class="text-danger"><%= message %></p>
                             <%}%>
-<div class="container p-4 form-group">
-    
-    <h1>Edit category</h1>
-    <input type="text" name="name" placeholder="category name" value="<%=cate.name%>" class="form-control mb-2" required>
-    <br>
-    <br>
-    <input type="text" name="description" placeholder="description" value="<%=cate.description%>" class="form-control mb-2" required>
-    <br><br>
-    <input type="hidden" name="id" value="<%=cate._id%>">
-    <br><br>
-    <button class="btn btn-success rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" type="submit">
-        update 
-    </button>
-    <a class="btn btn-info rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" href="/admin/Category"> Go Back</a>
-    <br><br>
+                    <div class="container p-4 form-group">
+                        
+                        <h1>Edit category</h1>
+                        <input type="text" name="name" placeholder="category name" value="<%=cate.name%>" class="form-control mb-2" required>
+                        <br>
+                        <br>
+                        <input type="text" name="description" placeholder="description" value="<%=cate.description%>" class="form-control mb-2" required>
+                        <br><br>
+                        <input type="hidden" name="id" value="<%=cate._id%>">
+                        <br><br>
+                        <button class="btn btn-success rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" type="submit">
+                            update 
+                        </button>
+                        <a class="btn btn-info rounded-pill ps-4 pe-4 pt-2 pb-2 mt-2" href="/admin/Category"> Go Back</a>
+                        <br><br>
 
-   
-</div>
-</form>
+                    
+                    </div>
+                    </form>
                 </div>
             </div>
             

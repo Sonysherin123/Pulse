@@ -54,6 +54,7 @@ user_route.get('/resetPassword',auth.isLogin,userController.loadresetpassword);
  user_route.post('/cartadd',  cartController.increment);
  user_route.post('/decrement', cartController.decrement);
  user_route.post('/pro-del', cartController.removeCart);
+ user_route.post("/addCartLoad", cartController.loadCartinWish);
  
  user_route.get('/orderPlaced',cartController.loadorderPlaced);
  user_route.get('/order',orderController.orders);
@@ -87,7 +88,8 @@ user_route.post("/verify-payment",auth.checkAuth,checkoutController.razopayment)
 
 
  user_route.get('/shop',userController.loadshop);
- //userRoute.post('/addToWallet',userController.addToWallet);
-
+ user_route.post('/search',productController.searchProducts);
+ user_route.post('/addToWallet',userController.addToWallet);
+ 
 
 module.exports = user_route;

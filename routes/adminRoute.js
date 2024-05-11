@@ -67,8 +67,12 @@ admin_route.get('/unblock-user',auth.isLogin,adminController.unblockUser);
 
 admin_route.get('/order', order.loadadminorder);
 admin_route.get('/orderDetails', order.loadOrderDetail);
-//admin_route.post("/orderSave", order.saveOrder)
+admin_route.post("/orderSave", order.saveOrder)
 admin_route.get('/orderDetails', order.loadOrderDetail);
+admin_route.get("/addOffer",adminController.addOfferLoad);
+admin_route.post("/addOfferPost",adminController.addOffer);
+admin_route.post('/deleteoffer',adminController.deleteOffer);
+admin_route.get("/catagoryOffer",adminController.loadCategoryOffer);
 
 admin_route.get("/coupon",couponController.loadCouponPage);
 admin_route.get("/addCoupon",couponController.loadAddCoupon);
@@ -77,20 +81,15 @@ admin_route.post("/coupon-block",couponController.blockCoupon);
 admin_route.get("/coupon-edit",couponController.loadEditCoupon);
 admin_route.post("/editCoupon",couponController.editCoupon);
 
-
-
-admin_route.get('/coupon',couponController.loadCouponPage);
-admin_route.get("/addCoupon",couponController.loadAddCoupon);
-admin_route.post("/addCoupon",couponController.addCoupon);
-admin_route.get('/coupon-edit',couponController.loadEditCoupon);
-admin_route.post('/editCoupon',couponController.editCoupon);
-admin_route.get('/coupon-block',couponController.blockCoupon);
-
-admin_route.post('/salesreport',adminController.salesReport);
+admin_route.get("/sales",adminController.loadSales)
+admin_route.get("/salesDate",adminController.dateFilter)
+admin_route.get("/date",adminController.sortDate)
 
 
 
-//admin_route.post('/refund',wallet.addtoWallet);
+
+
+admin_route.post('/refund',wallet.addtoWallet);
 
 
 

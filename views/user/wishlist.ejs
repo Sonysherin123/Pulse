@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Ruiz - Watch Store HTML Template</title>
+    <title>PULSE - Watch Store HTML Template</title>
     <meta name="robots" content="noindex, follow" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -154,8 +154,8 @@
                                     <li><a href="userProfile">My account</a></li>
                                     <li><a href="cart">Cart</a></li>
                                     <li><a href="wishlist">Wishlist</a></li>
-                                    <li><a href="orders">Order</a></li>
-                                    <li><a href="landingpage">Logout</a></li>
+                                    <li><a href="order">Orders</a></li>
+                                    <li><a href="/logout">Logout</a></li>
 
                                 </ul>
                             </div>
@@ -173,7 +173,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-4 col-5">
                             <div class="logo-area">
-                                <a href="home"><img src="assets/images/logo/logo.png" alt=""></a>
+                                <a href="index.html"><img  class="logo_image" src="/assets/images/logo/watch_logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -244,11 +244,11 @@
                                         <li><a href="shop">Shop </a>
                                            
                                         </li>
-                                        <li><a href="rolex">Rolex </a>
+                                        <li><a href="">MEN </a>
                                           
                                         </li>
-                                        <li><a href="">About Us</a></li>
-                                        <li><a href="">Contact</a></li>
+                                        <li><a href="">WOMEN</a></li>
+                                        <!-- <li><a href="">Contact</a></li> -->
                                     </ul>
                                 </nav>
 
@@ -256,7 +256,7 @@
                         </div>
 
                         <div class="col-5 col-md-6 d-block d-lg-none">
-                            <div class="logo"><a href="index.html"><img src="assets/images/logo/logo.png" alt=""></a></div>
+                            <div class="logo"><a href="index.html"><img src="/asse" alt=""></a></div>
                         </div>
                         
                         
@@ -307,8 +307,8 @@
                                         </li>
                                         <li class="mini-cart-btns">
                                             <div class="cart-btns">
-                                                <a href="cart.html">View cart</a>
-                                                <a href="checkout.html">Checkout</a>
+                                                <a href="cart">View cart</a>
+                                                <a href="checkOutData">Checkout</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -382,9 +382,9 @@
                                                 <ul class="dropdown">
                                                     <li><a href="error404.html">Error 404</a></li>
                                                     <li><a href="compare.html">Compare Page</a></li>
-                                                    <li><a href="cart.html">Cart Page</a></li>
-                                                    <li><a href="checkout.html">Checkout Page</a></li>
-                                                    <li><a href="wishlist.html">Wish List Page</a></li>
+                                                    <li><a href="cart">Cart Page</a></li>
+                                                    <li><a href="checkOutData">Checkout Page</a></li>
+                                                    <li><a href="wishlist">Wish List Page</a></li>
                                                 </ul>
                                             </li>
                                         </ul>
@@ -406,7 +406,7 @@
                                         </ul>
                                     </li>
                                     <li><a href="about-us.html">About Us</a></li>
-                                    <li><a href="contact-us.html">Contact</a></li>
+                                    <li><a href="contact-us">Contact</a></li>
                                 </ul>
                             </nav>
                             <!-- mobile menu navigation end -->
@@ -622,7 +622,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6">
                             <div class="copy-left-text">
-                                <p>Copyright &copy; <a href="#">Ruiz</a> 2019. All Right Reserved.</p>
+                                <p>Copyright &copy; <a href="#">PULSE</a> 2019. All Right Reserved.</p>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6">
@@ -678,29 +678,46 @@
 
 
     <script>
-         function addCart(id){
-            // const ids = document.getElementById('productId').value
-
-            const pdtOffPrice = document.getElementById('offerPrice').innerHTML
-
-            $.ajax({
-                url:"/addCartLoad",
-                method:"post",
-                data:{
-                    id,
-                    pdtOffPrice
-                },
-                success:(response)=>{
-                    if(response.status === true){
-                        window.location.href = "/cart"
+              function addCart(id) {
+            Swal.fire({
+                    icon: "success",
+                    title: "Added to cart",
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+    $.ajax({
+        url: "/addCart",
+        method: "post",
+        data: {
+            id: id
+        },
+        success: (response) => {
+            if (response.status === true) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "bottom",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: "black",
+                    color: "white",
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
                     }
-                    else if (response.status == "viewCart") {
-                        window.location.href = "/cart"
-                }
-                }
-            })
+                });
 
+                Toast.fire({
+                    icon: "success",
+                    title: "Added to cart"
+                }).then((result) => {
+                    window.location.href = "/cart";
+                });
+            }
         }
+    });
+}
+
         
 
         function remove(id){

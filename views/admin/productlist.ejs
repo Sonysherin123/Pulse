@@ -60,6 +60,24 @@
                         <span class="text">Categories</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/order"> <!-- Placeholder link for Categories -->
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/Coupon"> <!-- Placeholder link for Categories -->
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Coupon</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/addoffer"> <!-- Placeholder link for Categories -->
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">offer</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>
@@ -195,5 +213,56 @@
     <script src="/public/assets/js/vendor/jquery.fullscreen.min.js"></script>
     
     <script src="/public/assets/js/main.js" type="text/javascript"></script>
+    <script>
+    function validateForm() {
+        // Reset error messages
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('descriptionError').textContent = '';
+        document.getElementById('priceError').textContent = ''; // Added for price validation
+        document.getElementById('stockError').textContent = ''; // Added for stock count validation
+    
+        // Validate product name
+        var productName = document.getElementById('product_name').value.trim();
+        if (productName === '') {
+            document.getElementById('nameError').textContent = 'Please enter a product name';
+            return false;
+        }
+    
+        // Validate product description
+        var productDescription = document.getElementById('product_description').value.trim();
+        if (productDescription === '') {
+            document.getElementById('descriptionError').textContent = 'Please enter a product description';
+            return false;
+        }
+    
+        // Validate product price
+        var productPrice = document.getElementById('regular_price').value.trim();
+        if (productPrice === '') {
+            document.getElementById('priceError').textContent = 'Please enter a product price';
+            return false;
+        }
+        // Check if price is a valid number
+        if (isNaN(productPrice)) {
+            document.getElementById('priceError').textContent = 'Please enter a valid price';
+            return false;
+        }
+    
+        // Validate stock count
+        var stockCount = document.getElementById('stock_count').value.trim();
+        if (stockCount === '') {
+            document.getElementById('stockError').textContent = 'Please enter the stock count';
+            return false;
+        }
+        // Check if stock count is a valid number
+        if (isNaN(stockCount)) {
+            document.getElementById('stockError').textContent = 'Please enter a valid stock count';
+            return false;
+        }
+    
+        // If all validations pass, return true to submit the form
+        return true;
+    }
+    </script>
+    
 </body>
 </html>

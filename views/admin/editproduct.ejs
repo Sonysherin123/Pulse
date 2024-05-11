@@ -43,7 +43,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/product"> <!-- Placeholder link for Products -->
+                    <a class="menu-link" href="/admin/productlist"> <!-- Placeholder link for Products -->
                         <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
@@ -164,21 +164,39 @@
                                             <p id="priceError" class="text-danger"></p>
                                         </div>
                                     </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label for="discount_price" class="form-label">Discount Price</label>
+                                            <input placeholder="₹" type="text" class="form-control" name="discountPrice" id="discount_price">
+                                            <p id="discountPriceError" class="text-danger"></p> <!-- Placeholder for discount price error -->
+                                        </div>
+                                    </div>
                                    
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label for="stock_count" class="form-label">Count of Stock</label>
-                                            <input type="number" class="form-control" name="stock" id="stock_count"
-                                                value="<%= proData.countInStock %>" required>
+                                            <input type="text" class="form-control" name="stock" id="stock_count"
+                                                value="<%= proData.countInStock %>">
                                             <p id="stockError" class="text-danger"></p>
                                         </div>
                                     </div>
+                                    <div class="mb-4">
+                                        <% if(catData.length > 0) {
+                                            for(let i=0; i<catData.length; i++) { %>
+                                        <label class="mb-2 form-check form-check-inline" style="width: 45%;">
+                                            <input class="form-check-input" value="<%=catData[i]._id%>" name="category" id="category_<%= i %>" type="radio">
+                                            <span class="form-check-label"> <%=catData[i].name%> </span>
+                                        </label>
+                                        <%}}%>
+                                        <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
+                                    </div>
+                                    
                                 </div>
-                                <!-- Category Section -->
-                                <div class="mb-4">
-                                    <!-- Category options -->
-                                    <div id="categoryError" class="text-danger"></div>
+                               
+                               
+                                    </div> 
                                     <!-- Existing Images -->
+                                    <div class="mb-4">
                                     <label for="existing_images" class="form-label">Existing Images</label>
                                     <div id="existing_images_container">
                                         <% proData.images.forEach(image => { %>
@@ -223,6 +241,119 @@
     <!-- Validation Script -->
     <script>
         // Paste your validation script here
+        
+        // Attach event listeners to regular price field
+        document.getElementById('regular_price').addEventListener('blur', function() {
+            // alert("blur")
+            validateRegularPrice();
+        });
+    
+        // Attach event listeners to discount price field
+        // document.getElementById('discount_price').addEventListener('blur', function() {
+        //     validateDiscountPrice();
+        // });
+    
+        // Attach event listeners to stock count field
+        document.getElementById('stock_count').addEventListener('blur', function() {
+            // if (stock_count ===0){
+                // alert("blur")
+                
+            // }
+            validateStockCount();
+        });
+    
+        function validateRegularPrice() {
+            var regularPrice = document.getElementById('regular_price').value.trim();
+            if (regularPrice === '' || isNaN(regularPrice) || regularPrice < 0) {
+                document.getElementById('priceError').textContent = 'Please enter a valid regular price';
+                return false;
+            } else {
+                document.getElementById('priceError').textContent = '';
+                return true;
+            }
+        }
+    
+        function validateDiscountPrice() {
+            var discountPrice = document.getElementById('discount_price').value.trim();
+            var regularPrice = document.getElementById('regular_price').value.trim();
+            if (discountPrice === '' || isNaN(discountPrice) || discountPrice < 0 || parseFloat(discountPrice) >= parseFloat(regularPrice)) {
+                document.getElementById('discountPriceError').textContent = 'Please enter a valid discount price (less than regular price)';
+                return false;
+            } else {
+                document.getElementById('discountPriceError').textContent = '';
+                return true;
+            }
+        }
+    
+        function validateStockCount() {
+            var stockCount = document.getElementById('stock_count').value.trim();
+            // alert("hey")
+            if (stockCount === '' || isNaN(stockCount) || stockCount < 0) {
+                // alert("hello")
+                document.getElementById('stockError').textContent = 'Please enter a valid stock count';
+                return false;
+            } else {
+                document.getElementById('stockError').textContent = '';
+                return true;
+            }
+        }
+    
+        function validateForm() {
+            // Reset error messages
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('descriptionError').textContent = '';
+            document.getElementById('categoryError').textContent = '';
+            document.getElementById('imagesError').textContent = '';
+            document.getElementById('mainError').textContent = '';
+    
+            // Validate product name
+            var productName = document.getElementById('product_name').value.trim();
+            if (productName === '') {
+                document.getElementById('nameError').textContent = 'Please enter a product name';
+                return false;
+            }
+    
+            // Validate product description
+            var productDescription = document.getElementById('product_description').value.trim();
+            if (productDescription === '') {
+                document.getElementById('descriptionError').textContent = 'Please enter a product description';
+                return false;
+            }
+    
+            // Validate category selection
+            var categoryInputs = document.getElementsByName('category');
+            var categorySelected = false;
+            for (var i = 0; i < categoryInputs.length; i++) {
+                if (categoryInputs[i].checked) {
+                    categorySelected = true;
+                    break;
+                }
+            }
+            if (!categorySelected) {
+                document.getElementById('categoryError').textContent = 'Please select a category';
+                return false;
+            }
+    
+            // Validate images selection
+            var imagesInput = document.getElementById('product_images').files;
+            console.log(imagesInput);
+            if (imagesInput.length>0) {
+                if(imagesInput.length!==3){
+                    document.getElementById('imagesError').textContent = 'Please select at least one image';
+                return false;
+                }
+                
+            }
+    
+            // Validate regular price, discount price, and stock count
+            if (!validateRegularPrice() || !validateDiscountPrice() || !validateStockCount()) {
+                return false;
+            }
+    
+            // If all validations pass, return true
+            return true;
+        }
     </script>
+    
 </body>
 </html>

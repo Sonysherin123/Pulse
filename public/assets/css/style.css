@@ -3235,6 +3235,25 @@ img.mfp-img {
   padding: 0 0 0 10px;
 }
 
+.wishlist-btn {
+  background-color: #f8f9fa; /* Button background color */
+  color: #c89979; /* Button text color */
+  border: 1px solid #c89979; /* Button border */
+  /* padding: 2px 8px; Button padding */
+  border-radius: 4px; /* Button border radius */
+  cursor: pointer; /* Cursor style */
+
+  /* Transition effect for smooth hover */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover effect */
+.wishlist-btn:hover {
+  background-color: #c89979; /* Change background color on hover */
+  color: #fff; /* Change text color on hover */
+}
+
+
 .single-add-to-cart {
   max-width: 190px;
 }

@@ -123,40 +123,61 @@ const loadCoupon = async (req, res) => {
     }
   };
   
-const blockCoupon = async (req,res)=>{
-    try{
+// const blockCoupon = async (req,res)=>{
+//     try{
+//         const id = req.body.id;
+        
+//         const findCoupon = await Coupon.findById({_id:id});
+        
+//         if(findCoupon.isActive == true){
+//             const updateCoupon = await Coupon.findByIdAndUpdate({_id:id},
+//                 {
+//                     $set:{
+//                         isActive : false,
+//                     }
+//                 })
+
+//                 res.json({status:true})
+//         }
+//         else{
+            
+//             const updateCoupon = await Coupon.findByIdAndUpdate({_id:id},
+//                 {
+//                     $set:{
+//                         isActive : true,
+//                     }
+//                 })
+//                 const a = await Coupon.findById({_id:id})
+                
+//                 res.json({status:false})
+
+//         }
+//     }
+//     catch(error){
+//         console.log(error.message);
+//     }
+// }
+const blockCoupon = async (req, res) => {
+    try {
         const id = req.body.id;
         
-        const findCoupon = await Coupon.findById({_id:id});
+        const findCoupon = await Coupon.findById({_id: id});
         
-        if(findCoupon.isActive == true){
-            const updateCoupon = await Coupon.findByIdAndUpdate({_id:id},
-                {
-                    $set:{
-                        isActive : false,
-                    }
-                })
+        let newStatus = !findCoupon.isActive; // Toggle the isActive status
 
-                res.json({status:true})
-        }
-        else{
-            
-            const updateCoupon = await Coupon.findByIdAndUpdate({_id:id},
-                {
-                    $set:{
-                        isActive : true,
-                    }
-                })
-                const a = await Coupon.findById({_id:id})
-                
-                res.json({status:false})
+        const updateCoupon = await Coupon.findByIdAndUpdate({_id: id}, {
+            $set: {
+                isActive: newStatus,
+            }
+        });
 
-        }
-    }
-    catch(error){
+        res.json({status: newStatus});
+    } catch (error) {
         console.log(error.message);
+        res.status(500).json({ error: 'An error occurred' });
     }
 }
+
 
 const applyCoupon=async(req,res)=>{
     try {

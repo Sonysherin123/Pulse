@@ -2,24 +2,12 @@ const User = require('../model/userModel');
 const bcrypt = require("bcrypt");
 const {generateOTP}=require('../util/otpgenerater');
 const {sendInsertOtp}=require('../util/insertotp');
-const ProductModel=require('../model/productmodel');
-const userModel = require('../model/userModel');
+const Product = require('../model/productmodel');
 const addressModel = require('../model/addressmodel');
 const cartmodel = require('../model/cartmodel');
 const categoryModel=require('../model/categorymodel');
-const addressmodel = require('../model/addressmodel');
+const wishlistModel = require('../model/wishlistModel');
 
-
-// const Address = require('../models/Address'); // Adjust the path as needed
-
-// const Address = require("../models/addressModel");
-// const Product = require("../models/productModel");
-// const Cart = require("../models/cartModel")
-// const Category = require("../models/categoryModel");
-// const Wallet = require("../models/walletModel");
-// const Order =require("../models/orderModel")
-// // const referalCode = require("../utils/referalCode");
-// const Coupon = require('../models/couponModel');
 
 
 
@@ -108,9 +96,16 @@ const insertUser = async (req, res) => {
 
 const loadHome= async(req,res)=>{
     try{
-        const product=await ProductModel.find({is_deleted:false});
-        console.log(product);
-        res.render('home',{product});
+        const product=await Product.find({is_deleted:false});
+        const cartItems = await cartmodel.distinct("items.productId", { userId: req.session.user });
+const cartQty = cartItems.length || null;
+
+const wishlistProducts = await wishlistModel.distinct("products.productId", { user_id: req.session.user });
+const wishQty = wishlistProducts.length || null;
+
+
+        console.log(cartQty,wishQty);
+        res.render('home',{product,cartQty,wishQty});
     } catch(error){
         console.log(error.message);
     }
@@ -174,9 +169,9 @@ const LoadproductDetails=async(req,res)=>{
         console.log("enter detaikls");
         const id=req.query.id;
         console.log(id,"asdssd");
-        const product=await ProductModel.findById(id).populate('category');
+        const product=await Product.findById(id).populate('category');
         console.log(product,"pdttttttttttttt");
-        const products=await ProductModel.find({category:product.category._id});
+        const products=await Product.find({category:product.category._id});
         console.log(products,);
         res.render('productdetails',{product,products});
 
@@ -259,7 +254,7 @@ console.log('resendotp',error.message);
 }
 const loaduserprofile = async(req,res)=>{
     try{
-        const userData = await userModel.findById(req.session.user);
+        const userData = await User.findById(req.session.user);
         const address = await addressModel.findOne(
             { 'userId': req.session.user }
         );
@@ -274,7 +269,7 @@ const loaduserprofile = async(req,res)=>{
  const  editProfile = async(req,res)=>{
     try{
 
-        await userModel.findByIdAndUpdate({_id:req.session.user},{$set:{
+        await User.findByIdAndUpdate({_id:req.session.user},{$set:{
             name : req.body.name,
         
             mobile : req.body.mobile,
@@ -390,7 +385,7 @@ const editAddress = async (req, res) => {
         };
         
         // Update the address in the database
-        const result = await addressmodel.findOneAndUpdate(
+        const result = await addressModel.findOneAndUpdate(
             { 'address._id': addressId }, 
             { $set: { 'address.$': updatedAddress } }, 
             { new: true } 
@@ -418,7 +413,7 @@ const deleteAddress = async (req, res) => {
         const addressId = req.query.addressId;
 
         
-        const address = await addressmodel.findOne({ userId: req.session.user});
+        const address = await addressModel.findOne({ userId: req.session.user});
         console.log('..........afsfsrasfdsd',addressId,);
         
         if (!address) {
@@ -451,7 +446,7 @@ try{
 // const loadshop = async (req, res) => {
 //     try {
  
-//         const product = await ProductModel.find().populate('category');
+//         const product = await Product.find().populate('category');
 
 //         const categories = await categoryModel.find();
 
@@ -461,25 +456,235 @@ try{
 //     }
 // };
 
+// const loadshop = async (req, res) => {
+//     try {
+//         const sortby = req.query.sortby || null;
+//         const category = req.query.category || null;
+
+//         const perPage = 8;
+//         let page = parseInt(req.query.page) || 1;
+//         let sortQuery = {};
+
+//         // Validate page number to prevent out-of-range errors
+//         if (page < 1) {
+//             page = 1;
+//         }
+
+//         // Calculate total number of products
+//         const totalpdts = await productModel.countDocuments({});
+//         // Calculate total number of pages
+//         const totalPage = Math.ceil(totalpdts / perPage);
+
+//         switch (sortby) {
+//             case 'name_az':
+//                 sortQuery = { pname: 1 };
+//                 break;
+//             case 'name_za':
+//                 sortQuery = { pname: -1 };
+//                 break;
+//             case 'price_low_high':
+//                 sortQuery = { offprice: 1 };
+//                 break;
+//             case 'price_high_low':
+//                 sortQuery = { offprice: -1 };
+//                 break;
+//             case 'rating_lowest':
+//                 sortQuery = { rating: 1 };
+//                 break;
+//             default:
+//                 sortQuery = { all: -1 }; // Setting a default sorting option
+//                 break;
+//         }
+
+//         let productData;
+
+//         if (category) {
+//             // Fetch products based on category, pagination, and sorting
+//             productData = await productModel.find({ category: category })
+//                 .sort(sortQuery)
+//                 .skip(perPage * (page - 1))
+//                 .limit(perPage);
+//         } else {
+//             // Fetch products based on pagination and sorting
+//             productData = await productModel.find({})
+//                 .sort(sortQuery)
+//                 .skip(perPage * (page - 1))
+//                 .limit(perPage);
+//         }
+
+//         // Fetch user and category data
+//         const userData = req.session.user ? await User.findById(req.session.user) : null;
+//         const categoryData = await categoryModel.find({});
+
+//         // Fetch wishlist data if user is logged in
+//         let findWish = {};
+//         if (req.session.user && req.session.user._id) {
+//             const wishlistData = await Wishlist.findOne({ user_id: req.session.user._id });
+//             if (wishlistData) {
+//                 for (let i = 0; i < productData.length; i++) {
+//                     findWish[productData[i]._id] = wishlistData.products.some(p => p.productId.equals(productData[i]._id));
+//                 }
+//             }
+//         }
+
+//         for (let i = 0; i < productData.length; i++) {
+//             const product = productData[i];
+//             let offerPrice = product.offprice; // Initialize offer price with original price
+//             let discountPercentage = product.discountPercentage; // Initialize discount percentage with original value
+//             if (categoryData && categoryData.length > 0 && product.category) {
+//                 const category = categoryData.find(cat => cat._id.toString() === product.category.toString());
+//                 if (category && category.offer && new Date(category.offer.startDate) <= new Date() && new Date(category.offer.endDate) >= new Date()) {
+//                     const productPrice = product.price;
+//                     const productDiscountPercentage = product.discountPercentage;
+//                     const categoryDiscount = category.offer.discount;
+//                     const maxDiscount = Math.max(productDiscountPercentage, categoryDiscount);
+//                     offerPrice = productPrice - (productPrice * maxDiscount / 100);
+//                     discountPercentage = maxDiscount;
+//                 }
+//             }
+
+//             productData[i].offprice = offerPrice;
+        
+//         }
+
+
+//       const categories = await categoryModel.find({ is_blocked: false });
+//         res.render('shop', { user: userData, product: productData, category: categoryData,categories, page, totalPage, sortby, findWish, selectedCategory: req.query.category  });
+
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send("Internal Server Error");
+//     }
+// };
 const loadshop = async (req, res) => {
     try {
-        console.log("hai");
-        const product = await ProductModel.find().populate('category');
-        console.log("hello");
-        console.log(product);
-        // Define findWish (assuming it's obtained from somewhere)
-        const findWish = {}; // Example: You should replace this with your actual data
-        const categories = await categoryModel.find();
-        // Assuming sortby and selectedCategory are variables you want to pass to the view
-        const sortby = req.query.sortby || 'all'; // Default value 'all' if not provided in query
-        const selectedCategory = req.query.category || ''; // Default value '' if not provided in query
+        const sortby = req.query.sortby || null;
+        const category = req.query.category || null;
 
-        res.render('shop', { product, categories, sortby, selectedCategory, findWish });
+        const perPage = 8;
+        let page = parseInt(req.query.page) || 1;
+
+        // Validate page number to prevent out-of-range errors
+        if (page < 1) {
+            page = 1;
+        }
+
+        // Initialize sortQuery with default value
+        let sortQuery = {};
+
+        // Determine sorting order based on the sortby parameter
+        switch (sortby) {
+            case 'name_az':
+                sortQuery = { name: 1 };
+                break;
+            case 'name_za':
+                sortQuery = { name: -1 };
+                break;
+            case 'price_low_high':
+                sortQuery = { price: 1 };
+                break;
+            case 'price_high_low':
+                sortQuery = { price: -1 };
+                break;
+            case 'rating_lowest':
+                sortQuery = { rating: 1 };
+                break;
+            // Add more cases if needed
+            default:
+                // Default sorting
+                sortQuery = { _id: -1 };
+                break;
+        }
+
+        // Construct query based on category (if provided)
+        const query = category ? { category: category } : {};
+
+        // Fetch total number of products
+        const totalpdts = await Product.countDocuments(query);
+        // Calculate total number of pages
+        const totalPage = Math.ceil(totalpdts / perPage);
+
+        // Fetch products based on query, pagination, and sorting
+        const productData = await Product.find(query)
+            .sort(sortQuery)
+            .skip(perPage * (page - 1))
+            .limit(perPage);
+
+        // Fetch user data if logged in
+        const userData = req.session.user ? await User.findById(req.session.user) : null;
+        // Fetch category data
+        const categoryData = await categoryModel.find({});
+
+        // Fetch wishlist data if user is logged in
+        let findWish = {};
+        if (req.session.user && req.session.user._id) {
+            const wishlistData = await Wishlist.findOne({ user_id: req.session.user._id });
+            if (wishlistData) {
+                for (let i = 0; i < productData.length; i++) {
+                    findWish[productData[i]._id] = wishlistData.products.some(p => p.productId.equals(productData[i]._id));
+                }
+            }
+        }
+
+        // Modify productData to include offer price
+        for (let i = 0; i < productData.length; i++) {
+            const product = productData[i];
+            // Modify offer price here
+            productData[i].offprice = calculateOfferPrice(product, categoryData);
+        }
+
+        // Fetch categories
+        const categories = await categoryModel.find({ is_active: true });
+
+        // Render the shop page with data
+        // res.render('shop', { user: userData, product: productData, category: categoryData, categories, page, totalPage, sortby, findWish, selectedCategory: req.query.category });
+        // Render the shop page with data
+        res.render('shop', { user: userData, product: productData, category: categoryData, categories, page, totalPage: totalPage, sortby, findWish, selectedCategory: req.query.category });
+
     } catch (error) {
-        console.log(error);
+        console.log(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
+
+
+
+
+
+// Function to calculate offer price
+function calculateOfferPrice(product, categoryData) {
+    let offerPrice = product.price; // Initialize offer price with original price
+    if (categoryData && categoryData.length > 0 && product.category) {
+        const category = categoryData.find(cat => cat._id.toString() === product.category.toString());
+        if (category && category.offer && new Date(category.offer.startDate) <= new Date() && new Date(category.offer.endDate) >= new Date()) {
+            const productPrice = product.price;
+            const productDiscountPercentage = product.discountPercentage;
+            const categoryDiscount = category.offer.discount;
+            const maxDiscount = Math.max(productDiscountPercentage, categoryDiscount);
+            offerPrice = productPrice - (productPrice * maxDiscount / 100);
+        }
+    }
+    return offerPrice;
+}
+
+
+// Function to calculate offer price
+function calculateOfferPrice(product, categoryData) {
+    let offerPrice = product.offprice; // Initialize offer price with original price
+    if (categoryData && categoryData.length > 0 && product.category) {
+        const category = categoryData.find(cat => cat._id.toString() === product.category.toString());
+        if (category && category.offer && new Date(category.offer.startDate) <= new Date() && new Date(category.offer.endDate) >= new Date()) {
+            const productPrice = product.price;
+            const productDiscountPercentage = product.discountPercentage;
+            const categoryDiscount = category.offer.discount;
+            const maxDiscount = Math.max(productDiscountPercentage, categoryDiscount);
+            offerPrice = productPrice - (productPrice * maxDiscount / 100);
+        }
+    }
+    return offerPrice;
+}
+
+
 
 const addToWallet=async(req,res)=>{
     var instance = new Razorpay({
@@ -521,7 +726,9 @@ const addToWallet=async(req,res)=>{
   
   
   }
-  
+
+
+
 
 
 
@@ -545,7 +752,8 @@ module.exports = {
     deleteAddress,
     renderEditAddress,
     loadshop,
-    addToWallet
+    addToWallet,
+    
     
     
 }
