@@ -159,7 +159,7 @@
                                     <input placeholder="Type product description here" class="form-control" name="description" id="product_description" rows="4"></input>
                                     <p id="descriptionError" class="text-danger"></p> <!-- Placeholder for description error -->
                                 </div>
-                            
+                        
                                 <!-- Pricing Section -->
                                 <div class="row">
                                     <div class="col-lg-4">
@@ -184,33 +184,34 @@
                                         </div>
                                     </div>
                                 </div>
-                            
+                        
                                 <!-- Category Section -->
                                 <div class="mb-4">
-                                    <% if(category.length > 0) {
-                                        for(let i=0; i<category.length; i++) { %>
-                                    <label class="mb-2 form-check form-check-inline" style="width: 45%;">
-                                        <input class="form-check-input" value="<%=category[i]._id%>" name="category" id="category_<%= i %>" type="radio">
-                                        <span class="form-check-label"> <%=category[i].name%> </span>
-                                    </label>
-                                    <%}}%>
+                                    <label for="product_category" class="form-label">Category</label>
+                                    <select class="form-control" name="category" id="product_category">
+                                        <% if (category.length > 0) { %>
+                                            <% category.forEach(cat => { %>
+                                                <option value="<%= cat._id %>"><%= cat.name %></option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
                                     <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
                                 </div>
-                            
+                        
                                 <!-- Media Section for Images -->
                                 <div class="mb-4">
                                     <label for="product_images" class="form-label">Images</label>
-                                    <input type="file" class="form-control" name="images" id="product_images" multiple>
-                                    <small class="form-text text-muted">You can select multiple images.</small>
+                                    <input type="file" class="form-control" name="images" id="product_images" multiple accept="image/png, image/jpeg, image/jpg">
+                                    <small class="form-text text-muted">You can select multiple images. Only JPEG and PNG formats are allowed.</small>
                                     <p id="imagesError" class="text-danger"></p> <!-- Placeholder for images error -->
                                 </div>
-                            
+                        
                                 <div class="mb-4">
                                     <div id="mainError" class="text-danger"></div> <!-- Main error message placeholder -->
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </form>
-                            
+                        
                         </div>
                     </div> <!-- card end// -->
                 </div>
@@ -244,20 +245,17 @@
         document.getElementById('regular_price').addEventListener('blur', function() {
             validateRegularPrice();
         });
-    
+
         // Attach event listeners to discount price field
         document.getElementById('discount_price').addEventListener('blur', function() {
             validateDiscountPrice();
         });
-    
+
         // Attach event listeners to stock count field
         document.getElementById('stock_count').addEventListener('blur', function() {
-            if (stock_count ===0){
-                
-            }
             validateStockCount();
         });
-    
+
         function validateRegularPrice() {
             var regularPrice = document.getElementById('regular_price').value.trim();
             if (regularPrice === '' || isNaN(regularPrice) || regularPrice < 0) {
@@ -268,11 +266,15 @@
                 return true;
             }
         }
-    
+
         function validateDiscountPrice() {
             var discountPrice = document.getElementById('discount_price').value.trim();
             var regularPrice = document.getElementById('regular_price').value.trim();
-            if (discountPrice === '' || isNaN(discountPrice) || discountPrice < 0 || parseFloat(discountPrice) >= parseFloat(regularPrice)) {
+            if (discountPrice === '') {
+                document.getElementById('discountPriceError').textContent = '';
+                return true; // Discount price is optional
+            }
+            if (isNaN(discountPrice) || discountPrice < 0 || parseFloat(discountPrice) >= parseFloat(regularPrice)) {
                 document.getElementById('discountPriceError').textContent = 'Please enter a valid discount price (less than regular price)';
                 return false;
             } else {
@@ -280,7 +282,8 @@
                 return true;
             }
         }
-    
+
+
         function validateStockCount() {
             var stockCount = document.getElementById('stock_count').value.trim();
             if (stockCount === '' || isNaN(stockCount) || stockCount < 0) {
@@ -291,7 +294,26 @@
                 return true;
             }
         }
-    
+
+        function validateImages() {
+            var imagesInput = document.getElementById('product_images').files;
+            if (imagesInput.length === 0) {
+                document.getElementById('imagesError').textContent = 'Please select at least one image';
+                return false;
+            }
+
+            for (var i = 0; i < imagesInput.length; i++) {
+                var file = imagesInput[i];
+                if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+                    document.getElementById('imagesError').textContent = 'Only JPEG and PNG formats are allowed';
+                    return false;
+                }
+            }
+
+            document.getElementById('imagesError').textContent = '';
+            return true;
+        }
+
         function validateForm() {
             // Reset error messages
             document.getElementById('nameError').textContent = '';
@@ -299,52 +321,42 @@
             document.getElementById('categoryError').textContent = '';
             document.getElementById('imagesError').textContent = '';
             document.getElementById('mainError').textContent = '';
-    
+
             // Validate product name
             var productName = document.getElementById('product_name').value.trim();
             if (productName === '') {
                 document.getElementById('nameError').textContent = 'Please enter a product name';
                 return false;
             }
-    
+
             // Validate product description
             var productDescription = document.getElementById('product_description').value.trim();
             if (productDescription === '') {
                 document.getElementById('descriptionError').textContent = 'Please enter a product description';
                 return false;
             }
-    
+
             // Validate category selection
-            var categoryInputs = document.getElementsByName('category');
-            var categorySelected = false;
-            for (var i = 0; i < categoryInputs.length; i++) {
-                if (categoryInputs[i].checked) {
-                    categorySelected = true;
-                    break;
-                }
-            }
-            if (!categorySelected) {
+            var category = document.getElementById('product_category').value;
+            if (category === '') {
                 document.getElementById('categoryError').textContent = 'Please select a category';
                 return false;
             }
-    
+
             // Validate images selection
-            var imagesInput = document.getElementById('product_images').files;
-            if (imagesInput.length === 0) {
-                document.getElementById('imagesError').textContent = 'Please select at least one image';
+            if (!validateImages()) {
                 return false;
             }
-    
+
             // Validate regular price, discount price, and stock count
             if (!validateRegularPrice() || !validateDiscountPrice() || !validateStockCount()) {
                 return false;
             }
-    
+
             // If all validations pass, return true
             return true;
         }
-    </script>
-     
+    </script>     
 </body>
 
 </html>

@@ -540,7 +540,7 @@
                                                <% if(message) { %>
                                                 <p  class="message text-danger" id="timeset"> <%=message%> </p>
                                                 <%}%>
-
+                                                <p id="otpError" class="text-danger"></p>
                                                         <div class="login-input-box">
                                                             <input type="text" id="otp" name="otp"
                                                                 placeholder="Enter OTP" >
@@ -717,7 +717,7 @@
             function timer(n) {
                 document.getElementById("resend").disabled = true;
                 const interval = setInterval(() => {
-                    if (n == 60) { // Show "Resend OTP" button after 1 minute
+                    if (n == 60) { 
                         document.getElementById("resend").style.display = "inline-block";
                     }
                     if (n == 0) {
@@ -728,7 +728,7 @@
                     n = n - 1;
                 }, 1000);
             }
-            timer(20);
+            timer(60);
             setTimeout(()=>{
                 document.getElementById("timeset").innerHTML='';
 
@@ -759,6 +759,16 @@
 
 
         });
+
+        function verifyOTP(e) {
+    const otp = document.getElementById('otp').value.trim(); 
+    if (otp === '') {
+        document.getElementById('otpError').innerHTML = 'OTP is required';
+        return false;
+    }
+    return true;
+}
+
     </script>
 
 

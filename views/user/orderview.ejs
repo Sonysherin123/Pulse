@@ -642,11 +642,9 @@
                 <div class="d-flex justify-content-between align-items-center py-3">
                     <h2 class="h5 mb-0"><a href="#" class="text-muted"></a> Order #<%= findOrder.orderNumber %>
                     </h2>
-                    <% if(findOrder.status === 'Delivered' ) { %>
+                   
                         <button class="h6 mb-0 btn btn-rounded" onclick="invoice('<%=findOrder._id%>')">Invoice</button>
-                    <% } else { %>
-                        <button class="h6 mb-0 btn btn-rounded" onclick="invoice('<%=findOrder._id%>')" hidden>Invoice</button>
-                    <% } %>
+                
                 </div>
                
 
@@ -786,14 +784,18 @@
                                         </tr>
                                         <tr>
                                             <td colspan="2">Shipping</td>
-                                            <td class="text-end">₹0.00</td> <!-- Assuming shipping is free -->
+                                           <% if(pdttotal>2000){%>
+                                            <td class="text-end">₹100.00</td>
+                                           <% }else{%>
+                                                <td class="text-end">₹0.00</td>
+                                            <%}%>
+                                            <!-- Assuming shipping is free -->
                                         </tr>
                                         <% if (findOrder.discount && findOrder.discount> 0) { %>
 
                                             <tr>
-                                                <td colspan="2">Discount (Code: <%= findOrder.coupon %>:<%=
-                                                            findOrder.discount%>% OFF )</td>
-                                                <td class="text-danger text-end">-₹<%= discountAmount %>
+                                                <td colspan="2">Discount (Code: <%= findOrder.coupon %></td>
+                                                <td class="text-danger text-end">-₹<%= findOrder.discount %>
                                                 </td>
                                             </tr>
                                             <% } else { %>
@@ -897,8 +899,49 @@
                                 </address>
                             </div>
                         </div>
-                        
                         <div class="card mb-4">
+                            <div class="card-body" style="align-items: center; justify-content: center;">
+                                <% if (findOrder.status == "Canceled") { %>
+                                    <p style="color: rgb(226, 78, 20); font-size: 20px; font-weight: bold; text-align: center;">Order Canceled 😢</p>
+                                <% } else if (findOrder.status == "Delivered") { %>
+                                    <p style="color: rgb(20, 226, 30); font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center;">Order Delivered 🤩</p>
+                                    <div class="single-add-to-cart">
+                                        <button onclick="showReturnForm()" class="add-to-cart" style="margin-bottom: 30px; margin-left: 69px;">Request Return</button>
+                                    </div>
+                                    <div id="reason" style="display: none;">
+                                        <input type="radio" id="dont_want" name="reason" value="Don't want the product anymore" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <label for="dont_want">Don't want the product anymore</label><br>
+                                        <input type="radio" id="quality" name="reason" value="Quality of the product not as expected" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <label for="quality">Quality of the product not as expected</label><br>
+                                        <input type="radio" id="received_wrong" name="reason" value="Received wrong item" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <label for="received_wrong">Received wrong item</label><br>
+                                        <input type="radio" id="received_broken" name="reason" value="Received a broken/damaged item" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <label for="received_broken">Received a broken/damaged item</label><br>
+                                        <input type="radio" id="other_reason" name="reason" value="Other reason" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <label for="other_reason">Other reason</label><br>
+                                        <p class="text-danger" id="error" style="display: none;">Select one</p>
+                                        <button onclick="submitReturnRequest('<%=findOrder._id%>')" style="padding: 6px 8px; font-size: 14px; background-color: #c89979; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 30px; margin-top: 20px;">Submit</button>
+                                    </div>
+                                <% } else if (findOrder.status == "Return process") { %>
+                                    <a onclick="cancelReturn('<%= findOrder._id %>')" class="btn btn-rounded" style="align-items: center; justify-content: center; margin-left: 60px;">
+                                        <i class="fa fa-share-square mr-10"></i> Cancel Return
+                                    </a>
+                                <% } else if (findOrder.status == "Returned") { %>
+                                    <p style="color: rgb(20, 226, 30); font-size: 20px; font-weight: bold; margin-bottom: 30px;">The Order Returned</p>
+                                <% } else if (findOrder.status == "Payment Failed") { %>
+                                    <a onclick="continuePayment('<%= findOrder._id %>')" class="btn btn-rounded" style="margin-left: 60px;">
+                                        <i class="fa fa-share-square mr-10"></i> Continue Payment
+                                    </a>
+                                <% } else { %>
+                                    <button onclick="cancelOrder('<%= findOrder._id %>')" class="btn btn-rounded" style="margin-left: 60px;">
+                                        <i class="fa fa-share-square mr-10"></i> Cancel Order
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        
+                        <!-- <div class="card mb-4">
                             <div class="card-body" style="align-items: center; justify-content: center;">
                                     <% if (findOrder.status=="Canceled" ) { %>
 
@@ -973,7 +1016,7 @@
                                                     
                                   
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                  
 
@@ -1139,9 +1182,9 @@
 
     <script>
 
-    //     function invoice(id){
-    //     window.location.href="/loadInvoice?id="+id
-    // }
+        function invoice(id){
+        window.location.href="/loadInvoice?id="+id
+    }
 
 
 
@@ -1183,7 +1226,7 @@
     //         }
     //     });
     // }
-    // Function to cancel the order
+    //Function to cancel the order
 function cancelOrder(orderId) {
     $.ajax({
         url: "/cancelOrder",
@@ -1274,40 +1317,120 @@ function cancelOrder(orderId) {
 //         });
 // }
         
+function submitReturnRequest(orderId) {
+  
+    const reason = document.querySelector('input[name="reason"]:checked');
 
+    if (!reason) {
+        document.getElementById('error').style.display = 'block';
+        return;
+    }
 
-        function cancelReturn(id) {
-            $.ajax({
-                url: "/cancelReturn",
-                method: "post",
-                data: {
-                    id,
-                },
-                success: (response) => {
-                    if (response.status == true) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "bottom",
-                            showConfirmButton: false,
-                            timer: 1500,
-                            // timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: "success",
-                            title: "Return Successfully Cancelled"
-                        }).then((result) => {
-
-                            window.location.href = "/order"
-                        })
-                    }
-                }
-            })
+    fetch('/return', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: orderId, reason: reason.value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            alert('Return request submitted successfully.');
+            location.reload();
+        } else {
+            alert('Failed to submit return request.');
         }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
+
+//         function cancelReturn(id) {
+//             $.ajax({
+//                 url: "/cancelReturn",
+//                 method: "post",
+//                 data: {
+//                     id,
+//                 },
+//                 success: (response) => {
+//                     if (response.status == true) {
+//                         const Toast = Swal.mixin({
+//                             toast: true,
+//                             position: "bottom",
+//                             showConfirmButton: false,
+//                             timer: 1500,
+//                             // timerProgressBar: true,
+//                             didOpen: (toast) => {
+//                                 toast.onmouseenter = Swal.stopTimer;
+//                                 toast.onmouseleave = Swal.resumeTimer;
+//                             }
+//                         });
+//                         Toast.fire({
+//                             icon: "success",
+//                             title: "Return Successfully Cancelled"
+//                         }).then((result) => {
+
+//                             window.location.href = "/order"
+//                         })
+//                     }
+//                 }
+//             })
+//         }
+
+
+
+
+
+function showReturnForm() {
+    document.getElementById('reason').style.display = 'block';
+}
+
+// function submitReturnRequest(orderId) {
+//     const reason = document.querySelector('input[name="reason"]:checked');
+//     if (!reason) {
+//         document.getElementById('error').style.display = 'block';
+//         return;
+//     }
+
+//     fetch('/return', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ id: orderId, reason: reason.value })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.status) {
+//             alert('Return request submitted successfully.');
+//             location.reload();
+//         } else {
+//             alert('Failed to submit return request.');
+//         }
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
+
+function cancelReturn(orderId) {
+    fetch('/cancelReturn', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: orderId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            alert('Return request canceled successfully.');
+            location.reload();
+        } else {
+            alert('Failed to cancel return request.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
         const inputElement = document.getElementById('input');
 
@@ -1481,7 +1604,7 @@ function cancelOrder(orderId) {
                     let orderId=response.orderId
                     // alert(or derId)
                     var options = {
-                        "key": "rzp_test_lUdFfNwNjMAIHG", // Enter the Key ID generated from the Dashboard
+                        "key": "rzp_test_xaGkIpXmOWb28y", // Enter the Key ID generated from the Dashboard
                         "amount": response.order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         "currency": "INR",
                         "name": "PULSE",

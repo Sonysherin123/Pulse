@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 const loadCategory=async (req, res) => {
     try {
+        console.log("get cat");
         const category=await Category.find({});
         res.render('category',{category,message:null})
     }
@@ -15,20 +16,22 @@ const loadCategory=async (req, res) => {
 
 const createCategory = async (req, res) => {
     try {
+        console.log("create cat");
+       
         const name = req.body.name;
-        console.log("name")
+        console.log(name)
         const dis = req.body.description;
-        console.log("discription")
+        console.log(dis)
         const existingcate = await Category.findOne({
         
             name: name.toLowerCase(),
         
-      });
-      if(existingcate ){
-        const categorydetails = await Category.find();
+      }) || null;
+      console.log(existingcate)
+      if(existingcate!==null){
+        const categorydetails = await Category.find({});
           res.render('category',{category:categorydetails,message:'name is already entered'})
-      }
-else{
+      }else{
 
         const cat = new Category({
             name: name.toLowerCase(),
@@ -41,7 +44,8 @@ else{
       
     } catch (error) {
         console.log(error.message);
-        res.status(500).json({ status: false, error: "Internal Server Error" });
+        res.render('category',{category:categorydetails,message:'name is already entered'})
+      
     }
 };
 

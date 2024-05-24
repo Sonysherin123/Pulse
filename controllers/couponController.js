@@ -123,7 +123,7 @@ const loadCoupon = async (req, res) => {
     }
   };
   
-// const blockCoupon = async (req,res)=>{
+//const blockCoupon = async (req,res)=>{
 //     try{
 //         const id = req.body.id;
         
@@ -156,7 +156,7 @@ const loadCoupon = async (req, res) => {
 //     catch(error){
 //         console.log(error.message);
 //     }
-// }
+ 
 const blockCoupon = async (req, res) => {
     try {
         const id = req.body.id;
@@ -168,6 +168,7 @@ const blockCoupon = async (req, res) => {
         const updateCoupon = await Coupon.findByIdAndUpdate({_id: id}, {
             $set: {
                 isActive: newStatus,
+                
             }
         });
 
@@ -203,7 +204,10 @@ const applyCoupon=async(req,res)=>{
                     res.json({status:"invalid"})
                 }else{
                     const amount= (findCart.total/100)*findCode.discount
-                    console.log(amount);
+                     findCart.coupon=findCode.couponCode;
+                     findCart.discount=amount;
+                     await findCart.save();
+                    
                     // const updateCart=await Cart.findByIdAndUpdate({_id:findCart._id},{
                     //     $inc:{
                     //         total:-amount
@@ -224,6 +228,28 @@ const applyCoupon=async(req,res)=>{
         console.log(error.message)
     }
 }
+const removeCoupon = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        // Find the cart by ID
+        const findCart = await Cart.findOne({ _id: id });
+
+        if (findCart && findCart.coupon) {
+            // Reset the coupon-related fields in the cart
+            findCart.coupon = null;
+            findCart.discount = 0;
+            await findCart.save();
+
+            res.json({ status: true, message: "Coupon removed successfully", cartTotal: findCart.total });
+        } else {
+            res.json({ status: false, message: "No coupon to remove or cart not found" });
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.json({ status: false, message: "An error occurred" });
+    }
+};
   
 
 
@@ -238,6 +264,7 @@ module.exports = {
     editCoupon,
     loadCoupon,
     blockCoupon,
-    applyCoupon
+    applyCoupon,
+    removeCoupon
 
 }

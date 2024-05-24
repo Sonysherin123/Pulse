@@ -90,7 +90,7 @@ const orderSchema=new mongoose.Schema({
         },
         altPhone: {
             type: String,
-            required: true
+           
         }
     }],
     coupon:{

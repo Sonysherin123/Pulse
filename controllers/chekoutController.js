@@ -46,7 +46,7 @@ const loadCheckOutPage = async (req, res) => {
 const razopayment = async (req, res) => {
   try {
     const { payment, order, addressId, order_num, amount, couponCode, index } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const findCoupon = await coupon.findOne({ couponCode: couponCode });
 
     let hmac = crypto.createHmac("sha256", '7l3JbQrUmZdZ8tocVjWSV07y');
@@ -71,7 +71,7 @@ const razopayment = async (req, res) => {
       const date = generateDate();
 
       let orderData;
-      if (findCoupon) {
+      if (cartData.coupon) {
         orderData = new Order({
           userId: userData._id,
           orderNumber: orderNum,
@@ -82,8 +82,8 @@ const razopayment = async (req, res) => {
           orderDate: date,
           status: "Processing", // Initial status
           shippingAddress: address,
-          coupon: findCoupon.couponCode,
-          discount: findCoupon.discount
+          coupon: cartData.coupon,
+          discount: cartData.discount
         });
       } else {
         orderData = new Order({
@@ -212,13 +212,252 @@ const addCash = async (req, res) => {
   }
 };
 
+const invoice = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const findOrder = await Order.findById({ _id: id }).populate({ path: 'items.productId', model: 'Product' });
+
+    if (!findOrder) {
+      return res.status(404).send('Order not found');
+    }
+
+    let pdttotal = 0;
+    for (let i = 0; i < findOrder.items.length; i++) {
+      pdttotal += findOrder.items[i].subTotal;
+    }
+    const discountAmount = (pdttotal * (findOrder.discount / 100)).toFixed(2);
+    
+
+    const discount = findOrder.discount;
+
+    const vatRate = (discount / 100); 
+
+    const vatAmount = pdttotal * vatRate;
+    const totalWithVAT = pdttotal - vatAmount;
+    const data = {
+      "documentTitle": "INVOICE", 
+      "currency": "INR",
+      "taxNotation": "gst", 
+      "marginTop": 25,
+      "marginRight": 25,
+      "marginLeft": 25,
+      "marginBottom": 25,
+      "logo": "/public/assets/images/logo/cc.png", 
+      "background": "/public/assets/images/logo/cc.png", 
+      "sender": {
+          "company": "PULSE",
+          "address": "Kongad, Palakkad, Kerala",
+          "zip": "678632",
+          "city": "Kongad",
+          "country": "India" 
+      },
+      "client": {
+          "company": findOrder.shippingAddress[0].name.trim(),
+          "address": findOrder.shippingAddress[0].homeAddress,
+          "zip": findOrder.shippingAddress[0].pincode,
+          "city": findOrder.shippingAddress[0].city,
+          "country": findOrder.shippingAddress[0].state 
+      },
+      "products": findOrder.items.map(item => ({
+          "quantity": item.quantity.toString(),
+          "description": item.productId.pname,
+          "price": item.subTotal / item.quantity,
+      })),
+      "discountApplied": {
+          "couponCode": findOrder.couponCode,
+          "couponPercentage": findOrder.couponPercentage
+      }
+    };
+
+    const result = await easyinvoice.createInvoice(data);
+  
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=myInvoice.pdf');
+    res.send(Buffer.from(result.pdf, 'base64'));
+  } catch (error) {
+    console.error('Error generating invoice:', error.message);
+    res.status(500).send('Error generating invoice');
+  }
+};
+
+const continuePayment = async (req,res)=>{
+  try{
+  
+    const id=req.body.id
+    
+    const findOrder=await Order.findById(id)
+  
+    const pdtData = [];
+
+     
+
+    const stringOrder_id=findOrder.orderNumber.toString()
+
+    var options={
+      amount:findOrder.totalAmount*100,
+      currency:"INR",
+      receipt:stringOrder_id
+    }
+
+    instance.orders.create(options,async(error,razorpayOrder)=>{
+ 
+      if(!error){
+    
+        res.json({status:true,order:razorpayOrder,orderId:findOrder._id})
+        findOrder.status='Processing'
+        await findOrder.save();
+      }else{
+        console.error(error);
+      }
+    })
+  }
+  catch(error){
+    console.log(error.message);
+  }
+}
+
+
+// const continuePayment = async (req, res) => {
+//   try {
+    
+//     const id = req.body.id;
+    
+//     const findOrder = await Order.findById(id);
+//     if (!findOrder) {
+//       return res.status(404).json({ status: false, message: "Order not found" });
+//     }
+    
+//     const userData = await User.findById(req.session.user);
+//     if (!userData) {
+//       return res.status(404).json({ status: false, message: "User not found" });
+//     }
+
+//     const cartData = await Cart.findOne({ userId: userData._id });
+//     if (!cartData) {
+//       return res.status(404).json({ status: false, message: "Cart not found" });
+//     }
+
+//     const pdtData = [];
+//     for (let i = 0; i < findOrder.items.length; i++) {
+//       pdtData.push(findOrder.items[i]);
+//     }
+
+//     for (const item of findOrder.items) {
+//       const product = await Product.findById(item.productId);
+//       if (!product) {
+//         return res.status(404).json({ status: false, message: `Product with ID ${item.productId} not found` });
+//       }
+//       if (product.countInStock < item.quantity) {
+//         return res.status(400).json({ status: false, message: `Insufficient stock for product ${product.name}` });
+//       }
+//     }
+
+//     const stringOrder_id = findOrder.orderNumber.toString();
+
+//     var options = {
+//       amount: findOrder.totalAmount * 100,
+//       currency: "INR",
+//       receipt: stringOrder_id
+//     };
+
+//     instance.orders.create(options, async (error, razorpayOrder) => {
+//       if (!error) {
+//         await Cart.findByIdAndDelete(cartData._id);
+//         res.json({ status: true, order: razorpayOrder, orderId: findOrder._id });
+//       } else {
+//         console.error(error);
+//         res.status(500).json({ status: false, message: "Error creating Razorpay order" });
+//       }
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ status: false, message: "Internal server error" });
+//   }
+// };
+
+
+const paymentFailed =  async(req,res)=>{
+  try{
+    const {amount,address,couponCode,index}=req.body;
+    const userData = await User.findById(req.session.user);
+    const cartData = await Cart.findOne({ userId: userData._id });
+    const date = generateDate();
+    const orderNum = generateOrder.generateOrder();
+
+  
+      const addressData = await Address.findOne({ "address._id": address });
+      let addressin = addressData.address[index]
+
+      const pdtData = [];
+
+      for (let i = 0; i < cartData.items.length; i++) {
+        pdtData.push(cartData.items[i]);
+      }
+      const orderData = new Order({
+        userId: userData._id,
+        orderNumber: orderNum,
+        userEmail: userData.email,
+        items: pdtData,
+        totalAmount: amount,
+        orderType: "Razorpay",
+        orderDate: date,
+        status: "Payment Failed",
+        shippingAddress: addressin,
+        
+      });
+      const pay = await orderData.save();
+      res.json({status:"paymentfail"})
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const successPayment=async(req,res)=>{
+  try {
+    const {response,order}=req.body
+
+   
+    let hmac = crypto.createHmac("sha256", keySecret);
+
+    hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id);
+    hmac = hmac.digest("hex");
+
+    if(hmac == response.razorpay_signature){
+      // const userData = await User.findOne(req.session.user);
+      // const cartData = await Cart.findOne({ userId: userData._id });
+      const updateOrder=await Order.findByIdAndUpdate({_id:order},{
+        $set:{
+          status:"Processing"
+        }
+        
+      })
+      await updateOrder.save();
+
+      const orderup  = await Order.findById({_id:order}) 
+      res.json({status:true,order: orderup})
+
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+
+
+
 
 module.exports = {
     loadCheckOutPage,
     razopayment,
     loadWallet,
     addWalletCash,
-    addCash
+    addCash,
+    invoice,
+    continuePayment,
+    paymentFailed,
+    successPayment
+
     
 
 }

@@ -8,7 +8,8 @@ const order=require('../model/ordermodel')
 const generateDate = require("../util/dategenerater");
 const generateOrder = require("../util/otphandle")
 const Coupon=require('../model/couponmodel');
-const Razorpay=require('razorpay')
+const Razorpay=require('razorpay');
+const ordermodel = require("../model/ordermodel");
 
 var instance = new Razorpay({
     key_id: 'rzp_test_xaGkIpXmOWb28y',
@@ -453,16 +454,19 @@ const removeCart = async (req, res) => {
 
 const addOrder = async (req, res) => {
     try {
-        const { addressId, cartid, checkedOption,paymentOption,totalDis,code, index } = req.body;
-
+        
+        const { addressId, cartid, checkedOption,paymentOption,totalDis,code } = req.body;
+        
 
         const findCoupon = await Coupon.findOne({couponCode:code})
+         console.log(findCoupon);
 
         if(!addressId || !paymentOption){
             res.json({status:"fill the options"})
         }
         else if(paymentOption == "Cash On Delivery"){
             const userData = await User.findById(req.session.user);
+            console.log()
             const cartData = await Cart.findOne({ userId: userData._id });
     
             const pdtData = [];
@@ -474,8 +478,10 @@ const addOrder = async (req, res) => {
             const orderNum = generateOrder.generateOrder();
     
             const addressData = await Address.findOne({ "address._id": addressId });
+            console.log();
     
             let address = addressData.address[index]
+            console.log(addressData);
     
             const date = generateDate()
 
@@ -486,7 +492,7 @@ const addOrder = async (req, res) => {
                 await product.save();
             }
 
-              if(findCoupon){
+              if(cartData.coupon){
                 const orderData = new order({
                     userId: userData._id,
                     orderNumber: orderNum,
@@ -496,9 +502,9 @@ const addOrder = async (req, res) => {
                     orderType: paymentOption,
                     orderDate: date,
                     status: "Processing",
-                    shippingAddress: address,
-                    coupon : findCoupon.couponCode,
-                    discount : findCoupon.discount
+                    shippingAddress: [...addressData.address],
+                    coupon : cartData.coupon,
+                    discount : cartData.discount
                 });
         
                 await orderData.save();
@@ -514,7 +520,8 @@ const addOrder = async (req, res) => {
                     res.json({ status: true, order: orderData });
                     await Cart.findByIdAndDelete({ _id: cartData._id });
         
-              }else{
+              }
+              else{
                 const orderData = new order({
                     userId: userData._id,
                     orderNumber: orderNum,
@@ -524,7 +531,7 @@ const addOrder = async (req, res) => {
                     orderType: paymentOption,
                     orderDate: date,
                     status: "Processing",
-                    shippingAddress: address,
+                    shippingAddress: [...addressData.address],
                     
                 });
         
@@ -591,6 +598,55 @@ const addOrder = async (req, res) => {
         console.log(error);
     }
 };
+// const addOrder = async (req, res) => {
+//     try {
+//         const { addressId, cartid, checkedOption, paymentOption, totalDis, code, index } = req.body;
+
+//         if (!addressId || !paymentOption) {
+//             return res.json({ status: "fill the options" });
+//         }
+
+//         let findCoupon = null;
+//         if (code) {
+//             findCoupon = await Coupon.findOne({ couponCode: code });
+//             if (!findCoupon) {
+//                 return res.json({ status: "Coupon not found" });
+//             }
+//         }
+
+//         let userData = null;
+//         if (req.session.user) {
+//             userData = await User.findById(req.session.user);
+//             if (!userData) {
+//                 return res.json({ status: "User not found" });
+//             }
+//         } else {
+//             return res.json({ status: "User session not found" });
+//         }
+
+//         const cartData = await Cart.findOne({ userId: userData._id });
+//         if (!cartData) {
+//             return res.json({ status: "Cart not found" });
+//         }
+
+//         const addressData = await Address.findOne({ "address._id": addressId });
+//         if (!addressData) {
+//             return res.json({ status: "Address not found" });
+//         }
+
+//         const address = addressData.address[index];
+//         const date = generateDate();
+
+//     //   const orders=await ordermodel.findOne({})
+
+//         res.json({ status: true, message: "Order placed successfully",orders });
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ status: "error", message: "Internal server error" });
+//     }
+// };
+
 
 const loadorderPlaced = async (req, res) => {
     try {

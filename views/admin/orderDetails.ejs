@@ -291,7 +291,8 @@
                                                         <%= pdtData[i].name %>
                                                     </div>
                                                 </td>
-                                                <td>₹ <%= pdtData[i].price %></td>
+                                                <% let price=(findOrder.items[i].subTotal/findOrder.items[i].quantity) %>
+                                                <td>₹ <%= price %></td>
                                                 <td><%= findOrder.items[i].quantity %></td>
                                                 <td>
                                                     <% if (findOrder.orderType === "Razorpay") { %>
@@ -300,7 +301,8 @@
                                                         <span><%= findOrder.orderType %></span>
                                                     <% } %>
                                                 </td>
-                                                <td class="text-end">₹<%= findOrder.items[i].subTotal %></td>
+                                                <td class="text-end"><%  let sum=pdtData[i].price*findOrder.items[i].quantity %>
+                                                        ₹<%=sum%></td>
                                             </tr>
                                         <% } %>
                                     
@@ -309,11 +311,21 @@
                                                 <article class="float-end" style="margin-top:20px">
                                                     <dl class="dlist">
                                                         <dt>Subtotal:</dt>
-                                                        <dd>₹<%= findOrder.totalAmount %></dd>
+                                                        <dd><% 
+                                                            let Subtotal = findOrder.items.reduce((sum, item) => {
+                                                               return sum=sum +item.subTotal;
+                                                            },0);
+                                                        %>
+                                                        ₹<%=Subtotal%>
+                                                    </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Shipping cost:</dt>
-                                                        <dd>₹0.00</dd>
+                                                        <dd>₹<% if(findOrder.totalAmount>2000){%>
+                                                            100.00
+                                                           <% }else{%>
+                                                            0.00
+                                                            <%}%></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>

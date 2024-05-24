@@ -69,7 +69,8 @@
             padding: 5px 10px;
             /* Add padding for better visibility */
             border-radius: 5px;
-            /* Optional: Add border radius for rounded corners */
+            /* Optional: Add border radius for ro
+            d corners */
         }
 
         .search-result {
@@ -450,8 +451,8 @@
                                 <ul class="offcanvas-account-container">
                                     <li><a href="userProfile">My account</a></li>
                                     <li><a href="cart">Cart</a></li>
-                                    <li><a href="wishlist.html">Wishlist</a></li>
-                                    <li><a href="checkout.html">Checkout</a></li>
+                                    <li><a href="wishlist">Wishlist</a></li>
+                                    <li><a href="checkout">Checkout</a></li>
                                 </ul>
                             </div>
 
@@ -898,10 +899,12 @@
                                     const productElement = document.createElement('div');
                                     productElement.innerHTML = `
                                 <a href="/productDetails?id=${element._id}" class="product-link">
-                                    <img src="/productAssets/${element.images[0]}" alt="product">
+                                    <img src="/uploads/productImages/${element.images[0]}" alt="product">
                                     <div class="product-info">
                                         <p>${element.name}</p>
-                                        <p>₹${element.offprice}</p>
+                                        
+                                        <p>₹${element.price}</p>
+                                        
                                     </div>
                                 `;
 
@@ -921,6 +924,75 @@
                 hideNoProductFound();
             }
         }
+
+
+
+        function sorting() {
+            const selectedSortBy = document.getElementById('sortby').value;
+            fetch(`/shop?sortby=${selectedSortBy}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    } else {
+                        window.location.href = `/shop?sortby=${selectedSortBy}`;
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Error updating sorting:", error);
+                    // You can handle errors here, such as displaying an error message to the user
+                });
+        }
+// 
+// function SearchProduct() {
+//             const searchDataValue = inputElement.value.trim();
+
+
+//             if (searchDataValue !== "") {
+//                 showSearchResult();
+//                 debounce(() => {
+//                     console.log(searchDataValue)
+//                     $.ajax({
+//                         url: "/search",
+//                         method: "post",
+//                         data: {
+//                             searchDataValue
+//                         },
+//                         success: (response) => {
+//                             const searchResultsContainer = document.getElementById('searchResultsContainer')
+//                             searchResultsContainer.innerHTML = ""
+
+//                             if (response.searchProducts.length > 0) {
+//                                 response.searchProducts.forEach(element => {
+//                                     const productContainer = document.createElement('div');
+//                                     productContainer.classList.add('product-container');
+
+//                                     const productElement = document.createElement('div');
+//                                     productElement.innerHTML = `
+//                                 <a href="/productDetails?id=${element._id}" class="product-link">
+//                                     <img src="//${element.images[0]}" alt="product">
+//                                     <div class="product-info">
+//                                         <p>${element.name}</p>
+//                                         <p>₹${element.offprice}</p>
+//                                     </div>
+//                                 `;
+
+//                                     productContainer.appendChild(productElement);
+//                                     searchResultsContainer.appendChild(productContainer);
+//                                 });
+//                                 hideNoProductFound();
+//                             } else {
+//                                 hideSearchResult();
+//                                 showNoProductFound();
+//                             }
+//                         }
+//                     })
+//                 }, 500)();
+//             } else {
+//                 hideSearchResult();
+//                 hideNoProductFound();
+//             }
+//         }
 
 
 

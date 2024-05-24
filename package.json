@@ -13,8 +13,10 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "chart.js": "^4.4.3",
     "connect-flash": "^0.1.1",
     "dotenv": "^16.4.5",
+    "easyinvoice": "^3.0.47",
     "ejs": "^3.1.9",
     "env": "^0.0.2",
     "exceljs": "^4.4.0",

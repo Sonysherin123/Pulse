@@ -749,7 +749,7 @@
                                                 <input class="button" name="apply_coupon" value="Apply coupon"
                                                     id="apply" onclick="apply('<%= cartData._id %>')" type="submit">
                                                 <input class="button" name="apply_coupon" value="Remove coupon"
-                                                    id="remove" style="display: none;" onclick="remove()" type="submit">
+                                                    id="remove" style="display: none;" onclick="remove('<%= cartData._id %>')" type="submit">
                                                 <br><br>
                                                 <div style=" justify-content: center;">
                                                     <a href="/coupon" class="btn button" id="show">Available Coupons</a>
@@ -800,6 +800,8 @@
                                                                 alteration. </p>
                                                         </div> -->
                                         <!-- </div> -->
+                                       
+                                    <%if(cartData.total <=1000){%>
                                         <input class="form-check-input" required="" type="radio"
                                         name="payment_option" id="cashOnDelivery" value="Cash On Delivery"
                                         checked>
@@ -809,7 +811,7 @@
                                         style="font-size: 15px; font-weight: 500;"><span class="me-3"></span>
                                         Cash on Delivery
                                     </label>
-                                    <%if((cartData.total) <=1000){%>
+
                                     <input class="form-check-input" required type="radio"
                                                     name="payment_option" id="razorpay" value="Razorpay">
                                                 <label class="form-check-label" for="razorpay" data-bs-toggle="collapse"
@@ -1054,11 +1056,12 @@
             //    alert(cartid)
             //    alert(index)
             //    alert(checkedOption)
-            // const code = document.getElementById("Code").value
+            const code = document.getElementById("Code").value
             let paymentOption = document.querySelector('input[name="payment_option"]:checked').value
            
-            const totalDis = document.getElementById("cartSubtotal").innerHTML
-            // alert(paymentOption)
+           
+            const totalDis = document.getElementById("cartSubtotal").innerHTML.trim()
+            alert(totalDis)
             $.ajax({
                 url: "/checkOutData",
                 method: "post",
@@ -1067,14 +1070,17 @@
                     cartid,
                     index,
                     paymentOption,
-                    totalDis
+                    totalDis,
+                    code,
+                    
+
                 },
                 success: (response) => {
                     
                     if (response.status === true) {
-                        alert('hi')
-                        window.location.href = `/orderPlaced?id=${response.order.orderNumber}`
-
+                        
+                        window.location.href = `/orderPlaced?id=${response.orders.orderNumber}`;
+                       
                     }
                     else if (response.status === "fill the options") {
 
@@ -1133,7 +1139,9 @@
                         var rzp1 = new Razorpay(options);
 
                         rzp1.open()
-                        rzp1.on()
+                        rzp1.on('payment.failed', function (response) {
+                    paymentFailed(amount, address, couponCode, index);
+                });
                         }
 
 
@@ -1161,7 +1169,7 @@
                     },
                     success: (response) => {
                         if (response.status == true) {
-                            window.location.href = `/orderPlaced?id=${response.order.orderNumber}`
+                            window.location.href = `/orderPlaced?id=${response.orders.orderNumber}`
                         }
                     }
                 }
@@ -1291,26 +1299,57 @@
             })
         }
 
-        function remove() {
+        function remove(id) {
+    $.ajax({
+        url: "/remove_coupon",
+        method: "post",
+        data: { id },
+        success: (response) => {
             const Toast = Swal.mixin({
                 toast: true,
                 position: "bottom",
                 showConfirmButton: false,
                 timer: 1500,
-                // timerProgressBar: true,
                 didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
                 }
             });
-            Toast.fire({
-                icon: "success",
-                title: "Coupon Removed"
-            }).then((result) => {
-                window.location.href = "/checkoutData"
-            })
 
+            if (response.status) {
+                Toast.fire({
+                    icon: "success",
+                    title: "Coupon Removed"
+                }).then((result) => {
+                    window.location.href = "/checkoutData";
+                });
+            } else {
+                Toast.fire({
+                    icon: "error",
+                    title: response.message || "Failed to remove coupon"
+                });
+            }
+        },
+        error: (error) => {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 1500,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            Toast.fire({
+                icon: "error",
+                title: "An error occurred"
+            });
         }
+    });
+}
+
 
 
         const inputElement = document.getElementById('input');

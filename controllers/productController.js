@@ -41,6 +41,7 @@ const addProduct = async (req, res) => {
             images: images,
             brand: req.body.brand,
             countInStock: req.body.stock,
+            discountPrice: req.body.discountPrice,
             category: req.body.category,
             price: req.body.price
 
@@ -132,9 +133,9 @@ const editProduct = async (req, res) => {
         console.log(allImages,"alllllimage");
 
         // Limit images to 3
-        if (newImages.length !==0) {
-            return res.render('editproduct', { catData: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
-        } else {
+        // if (newImages.length !==0) {
+        //     return res.render('editproduct', { catData: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
+        // } else {
             console.log("else workinggg");
             // Update the product with new data
             const updatedProduct = await Product.findByIdAndUpdate(req.query.id, {
@@ -153,7 +154,7 @@ const editProduct = async (req, res) => {
                 console.log("update product");
                 return res.redirect('/admin/productlist');
             }
-        }
+        // }
     } catch (error) {
         console.log('update product:', error.message);
         res.status(500).send('An error occurred');

@@ -13,6 +13,8 @@ const orderController = require("../controllers/ordercontroller");
 const couponController = require('../controllers/couponController');
 const productController = require('../controllers/productController');
 const wishlistController = require('../controllers/wishlistController')
+var easyinvoice = require('easyinvoice');
+
 
 user_route.set('view engine', 'ejs');
 user_route.set('views', './views/user');
@@ -60,8 +62,8 @@ user_route.get('/resetPassword',auth.isLogin,userController.loadresetpassword);
  user_route.get('/order',orderController.orders);
  user_route.get('/orderView',orderController.loadViewOrder);
  user_route.post('/cancelOrder',orderController.cancelOrder);
-//  user_route.post("/cancelReturn",auth.checkAuth,orderController.cancelReturn);
-//  user_route.post("/return",auth.checkAuth,orderController.returnRequest);
+ user_route.post("/cancelReturn",auth.checkAuth,orderController.cancelReturn);
+  user_route.post("/return",orderController.returnRequest);
 
 
  user_route.get("/wallet",auth.checkAuth,checkoutController.loadWallet);
@@ -84,12 +86,19 @@ user_route.get('/wishlist',wishlistController.loadWishlist);
 
  user_route.get("/coupon", auth.checkAuth,couponController.loadCoupon);
 user_route.post("/applyCoupon",  auth.checkAuth, couponController.applyCoupon);
+user_route.post('/remove_coupon',couponController.removeCoupon); 
 user_route.post("/verify-payment",auth.checkAuth,checkoutController.razopayment);
+user_route.post('/continuePayment',checkoutController.continuePayment);
+user_route.post('/payment-success',checkoutController.successPayment);
+user_route.post('/paymentfailed',checkoutController.paymentFailed);
+
 
 
  user_route.get('/shop',userController.loadshop);
  user_route.post('/search',productController.searchProducts);
  user_route.post('/addToWallet',userController.addToWallet);
  
+ user_route.get('/pdf',checkoutController.invoice);
+user_route.get("/loadInvoice",userController.loadInvoice)
 
 module.exports = user_route;

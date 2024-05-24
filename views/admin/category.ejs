@@ -138,7 +138,7 @@
                     <p>Add, edit or delete a category</p>
                 </div>
                 <div>
-                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
+                    <input type="text" placeholder="Search Categories" class="form-control bg-white"> 
                 </div>
             </div>
           
@@ -147,10 +147,10 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div>
-                                <form id="categoryForm" method="post"> 
+                                <form id="categoryForm" method="post" action="" > 
                                     <div class="mb-4">
                                         <label for="product_name" class="form-label">Name</label>
-                                        <input type="text" placeholder="Type here" class="form-control" name="name" id="product_name" />
+                                        <input type="text" placeholder="Type here" class="form-control" name="name"  id="product_name" onblur="Funname()" />
                                         <p id="nameError" class="text-danger"></p>
                                     </div>
                                     <div class="mb-4">
@@ -163,7 +163,7 @@
                                         <%if(message){%>
                                             <p class="text-danger"><%=message%></p>
                                         <%}%>
-                                        <button type="submit" class="btn btn-primary">Create category</button>
+                                        <button type="submit"   class="btn btn-primary">Create category</button>
                                     </div>
                                 </form>
                                 
@@ -246,78 +246,114 @@
     <!-- Main Script -->
     <script src="admin-assets/js/main.js" type="text/javascript"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("categoryForm").addEventListener("submit", function(e) {
-        e.preventDefault();
+
+//         document.addEventListener("DOMContentLoaded", function() {
+//     document.getElementById("categoryForm").addEventListener("submit", function(e) {
+        
         
 
-        // Clear previous error messages
-        document.getElementById("nameError").textContent = "";
-        document.getElementById("descriptionError").textContent = "";
-        document.getElementById("categoryError").textContent = ""; 
+//         // Clear previous error messages
+//         document.getElementById("nameError").textContent = "";
+//         document.getElementById("descriptionError").textContent = "";
+//         document.getElementById("categoryError").textContent = ""; 
 
-        const nameInput = document.getElementById("product_name").value;
-        const descriptionInput = document.getElementById("description").value;
+//         const nameInput = document.getElementById("product_name").value;
+//         const descriptionInput = document.getElementById("description").value;
        
 
-        // Validate Name
-        if (nameInput.trim() === "") {
-            document.getElementById("nameError").textContent = "Name cannot be empty.";
-            return;
-        }
-
-        if (!/^[a-zA-Z\s]*$/.test(nameInput) || (/^\s|\s$/.test(nameInput)) ) {
-            document.getElementById("nameError").textContent = "Name should only contain letters and spaces.";
-            return;
-        }
-
-        if (nameInput.length < 3) {
-            document.getElementById("nameError").textContent = "Name must be at least 3 characters long.";
-            return;
-        }
-
-        // Validate Description
-        if (descriptionInput.trim() === "") {
-            document.getElementById("descriptionError").textContent = "Description cannot be empty.";
-            return;
-        }
+//         // Validate Name
+//         if (nameInput.trim() === "") {
+//             alert(nameInput)
+//             document.getElementById("nameError").innerHTML = "Name cannot be empty.";
+//             return;
+//         }else if (!/^[a-zA-Z\s]*$/.test(nameInput) || (/^\s|\s$/.test(nameInput)) ) {
+//             alert(nameInput)
+//             document.getElementById("nameError").textContent = "Name should only contain letters and spaces.";
+//             return;
+//         }else if (nameInput.length < 3) {
+            
+//             document.getElementById("nameError").textContent = "Name must be at least 3 characters long.";
+//             return;
+//         } else  if (descriptionInput.trim() === "") {
+//             document.getElementById("descriptionError").textContent = "Description cannot be empty.";
+//             return;
+//         }else{
+//             this.submit();
+//         }
 
         
 
-        // Submit the form if all validations pass
-        this.submit();
-    });
-});
+        
 
-// function activate(id) {
-//     // Show confirmation dialog before activating
-//     swal({
-//         title: "Are you sure?",
-//         text: "Once activated, this category will be visible to users.",
-//         icon: "warning",
-//         buttons: true,
-//         dangerMode: true,
-//     })
-//     .then((willActivate) => {
-//         if (willActivate) {
-//             fetch(`/admin/delete-cate?id=${id}`)
-//                 .then(response => {
-//                     if (response.ok) {
-//                         window.location.reload();
-//                     } else {
-                       
-//                         throw new Error('Failed to activate category');
-//                     }
-//                 })
-//                 .catch(error => {
-//                     console.error('Error:', error);
-               
-//                 });
-//         } else {
-           
-//         }
+//         // Validate Description
+       
+
+//         // e.preventDefault();
+
+        
+
+//         // Submit the form if all validations pass
+       
 //     });
-// }
+// }); 
+
+function Funname(){
+    let nameaValue=document.getElementById("product_name").value
+    // alert(nameaValue)
+    let nameErr=document.getElementById("nameError")
+
+
+    if(nameaValue==""){
+        nameErr.innerHTML="Name is require"
+    }else if(nameaValue.length<3){
+        nameErr.innerHTML="Name will be more than 3 letters"
+    }else if(!/^[a-zA-Z\s]*$/.test(nameaValue)) {
+        nameErr.innerHTML="Name will be alphabets"
+    }else{
+        nameErr.innerHTML=""
+    }
+}
+
+
+document.getElementById("categoryForm").addEventListener("submit",(e)=>{
+    let nameErr=document.getElementById("nameError").innerHTML
+
+    if(nameErr){
+        e.preventDefault()
+    }
+})
+
+    
+
+function activate(id) {
+    // Show confirmation dialog before activating
+    swal({
+        title: "Are you sure?",
+        text: "Once activated, this category will be visible to users.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willActivate) => {
+        if (willActivate) {
+            fetch(`/admin/delete-cate?id=${id}`)
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                       
+                        throw new Error('Failed to activate category');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+               
+                });
+        } else {
+           
+        }
+    });
+}
 
 
     </script>

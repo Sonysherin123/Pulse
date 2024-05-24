@@ -180,7 +180,7 @@
                                             <p id="stockError" class="text-danger"></p>
                                         </div>
                                     </div>
-                                    <div class="mb-4">
+                                    <!-- <div class="mb-4">
                                         <% if(catData.length > 0) {
                                             for(let i=0; i<catData.length; i++) { %>
                                         <label class="mb-2 form-check form-check-inline" style="width: 45%;">
@@ -188,9 +188,22 @@
                                             <span class="form-check-label"> <%=catData[i].name%> </span>
                                         </label>
                                         <%}}%>
+                                        <div id="categoryError" class="text-danger"></div>  Placeholder for category error 
+                                    </div>-->
+
+                                    <div class="mb-4">
+                                        <label for="category" class="form-label">Category</label>
+                                        <select class="form-select" id="category" name="category">
+                                            <% if(catData.length > 0) {
+                                                for(let i=0; i<catData.length; i++) { %>
+                                                    <option value="<%=catData[i]._id%>"><%=catData[i].name%></option>
+                                                <% }
+                                            } %>
+                                        </select>
                                         <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
                                     </div>
                                     
+                                     
                                 </div>
                                
                                
@@ -218,6 +231,7 @@
                                 <div class="mb-4">
                                     <button type="submit" class="btn btn-primary">Update Product</button>
                                 </div>
+                                <input type="hidden" id="images" value="<%=proData.images.length%>"></input>
                             </form>
                         </div>
                     </div> <!-- card end// -->
@@ -240,28 +254,13 @@
     <script src="admin-assets/js/main.js" type="text/javascript"></script>
     <!-- Validation Script -->
     <script>
-        // Paste your validation script here
-        
         // Attach event listeners to regular price field
-        document.getElementById('regular_price').addEventListener('blur', function() {
-            // alert("blur")
-            validateRegularPrice();
-        });
-    
-        // Attach event listeners to discount price field
-        // document.getElementById('discount_price').addEventListener('blur', function() {
-        //     validateDiscountPrice();
-        // });
+        document.getElementById('regular_price').addEventListener('blur', validateRegularPrice);
     
         // Attach event listeners to stock count field
-        document.getElementById('stock_count').addEventListener('blur', function() {
-            // if (stock_count ===0){
-                // alert("blur")
-                
-            // }
-            validateStockCount();
-        });
+        document.getElementById('stock_count').addEventListener('blur', validateStockCount);
     
+        // Validate regular price
         function validateRegularPrice() {
             var regularPrice = document.getElementById('regular_price').value.trim();
             if (regularPrice === '' || isNaN(regularPrice) || regularPrice < 0) {
@@ -273,23 +272,10 @@
             }
         }
     
-        function validateDiscountPrice() {
-            var discountPrice = document.getElementById('discount_price').value.trim();
-            var regularPrice = document.getElementById('regular_price').value.trim();
-            if (discountPrice === '' || isNaN(discountPrice) || discountPrice < 0 || parseFloat(discountPrice) >= parseFloat(regularPrice)) {
-                document.getElementById('discountPriceError').textContent = 'Please enter a valid discount price (less than regular price)';
-                return false;
-            } else {
-                document.getElementById('discountPriceError').textContent = '';
-                return true;
-            }
-        }
-    
+        // Validate stock count
         function validateStockCount() {
             var stockCount = document.getElementById('stock_count').value.trim();
-            // alert("hey")
             if (stockCount === '' || isNaN(stockCount) || stockCount < 0) {
-                // alert("hello")
                 document.getElementById('stockError').textContent = 'Please enter a valid stock count';
                 return false;
             } else {
@@ -298,13 +284,13 @@
             }
         }
     
+        // Validate form on submission
         function validateForm() {
             // Reset error messages
             document.getElementById('nameError').textContent = '';
             document.getElementById('descriptionError').textContent = '';
             document.getElementById('categoryError').textContent = '';
             document.getElementById('imagesError').textContent = '';
-            document.getElementById('mainError').textContent = '';
     
             // Validate product name
             var productName = document.getElementById('product_name').value.trim();
@@ -320,33 +306,52 @@
                 return false;
             }
     
-            // Validate category selection
-            var categoryInputs = document.getElementsByName('category');
-            var categorySelected = false;
-            for (var i = 0; i < categoryInputs.length; i++) {
-                if (categoryInputs[i].checked) {
-                    categorySelected = true;
-                    break;
-                }
-            }
-            if (!categorySelected) {
-                document.getElementById('categoryError').textContent = 'Please select a category';
-                return false;
-            }
+            // // Validate category selection
+            // var categoryInputs = document.getElementsByName('category');
+            // var categorySelected = false;
+            // for (var i = 0; i < categoryInputs.length; i++) {
+            //     if (categoryInputs[i].checked) {
+            //         categorySelected = true;
+            //         break;
+            //     }
+            // }
+            // if (!categorySelected) {
+            //     document.getElementById('categoryError').textContent = 'Please select a category';
+            //     return false;
+            // }
+            var selectedCategory = document.getElementById('category').value;
+    if (selectedCategory === '') {
+        document.getElementById('categoryError').textContent = 'Please select a category';
+        return false;
+    }
     
             // Validate images selection
+            var existingImagesCount = parseInt(document.getElementById('images').value);
             var imagesInput = document.getElementById('product_images').files;
-            console.log(imagesInput);
-            if (imagesInput.length>0) {
-                if(imagesInput.length!==3){
-                    document.getElementById('imagesError').textContent = 'Please select at least one image';
+            if (existingImagesCount === 0 && imagesInput.length === 0) {
+                // No image selected
+                document.getElementById('imagesError').textContent = 'Please select at least one image';
                 return false;
+            } else if ((imagesInput.length + existingImagesCount) > 3) {
+                // More than three images selected
+                document.getElementById('imagesError').textContent = 'You can upload up to three images only';
+                return false;
+            } else {
+                // Validate image formats
+                for (var i = 0; i < imagesInput.length; i++) {
+                    var fileName = imagesInput[i].name.toLowerCase();
+                    var extension = fileName.split('.').pop();
+                    if (extension !== 'jpg' && extension !== 'jpeg' && extension !== 'png' && extension !== 'gif') {
+                        document.getElementById('imagesError').textContent = 'Invalid image format. Please upload images in JPG, JPEG, PNG, or GIF format';
+                        return false;
+                    }
                 }
-                
+                // Valid number of images selected and valid image formats
+                document.getElementById('imagesError').textContent = '';
             }
     
-            // Validate regular price, discount price, and stock count
-            if (!validateRegularPrice() || !validateDiscountPrice() || !validateStockCount()) {
+            // Validate regular price and stock count
+            if (!validateRegularPrice() || !validateStockCount()) {
                 return false;
             }
     
@@ -354,6 +359,7 @@
             return true;
         }
     </script>
+    
     
 </body>
 </html>

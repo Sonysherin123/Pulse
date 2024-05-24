@@ -28,6 +28,13 @@ const cartSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    coupon:{
+      type:String
+    },
+    discount:{
+      type:Number
+    }
+
   },
   { timestamps: true, versionKey: false }
 );

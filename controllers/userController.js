@@ -7,7 +7,7 @@ const addressModel = require('../model/addressmodel');
 const cartmodel = require('../model/cartmodel');
 const categoryModel=require('../model/categorymodel');
 const wishlistModel = require('../model/wishlistModel');
-
+const Order=require('../model/ordermodel')
 
 
 
@@ -186,13 +186,12 @@ const getOTP=async(req,res)=>{
     
             // console.log("ssjtgjuykdfg")
             try{
-                const otpInBody = req.body.otp;
-                console.log(otpInBody,'otp...............................');
-                console.log(req.session.Data.otp);
+                const otpInBody = req.body.otp
                 const otp = req.session.Data.otp;
                 const otpTimestamp = req.session.Data.otpTimestamp;
                 const currentDate = Date.now();
-                if(otpInBody === otp && (currentDate - otpTimestamp)<= 20000 ){
+                console.log(currentDate-otpTimestamp)
+                if(otpInBody === otp && (currentDate - otpTimestamp)<= 600000 ){
                     // const {name, email, mobileno, userpassword, confirmpassword, otp, otpTimestamp} = req.session.Data
                     const {name, email, mobileno, userpassword} = req.session.Data
 
@@ -216,12 +215,12 @@ const getOTP=async(req,res)=>{
                 }
                 else{
                     // return res.status(400).json({error:"otp invalid"}); 
-                    if((currentDate - otpTimestamp) > 20000){
+                    if((currentDate - otpTimestamp) > 60000){
                         req.session.Data.otp =null;
                         return res.render('OTP',{message: "otp expired"})
                     }
                     else{
-                        return res.render('OTP',{message: "Otp incorrect"})
+                        return res.render('OTP',{message: "Incorrect Otp"})
 
                     }
                 }
@@ -728,6 +727,41 @@ const addToWallet=async(req,res)=>{
   }
 
 
+  const loadInvoice=async(req,res)=>{
+    try {
+      const id=req.query.id
+      const findOrder=await Order.findById({_id:id})
+  
+  
+      const proId = [];
+  
+      for (let i = 0; i < findOrder.items.length; i++) {
+        proId.push(findOrder.items[i].productId);
+      }
+  
+      const proData = [];
+  
+      for (let i = 0; i < proId.length; i++) {
+        proData.push(await Product.findById({ _id: proId[i] }));
+      }
+  
+      
+      
+  
+  
+  
+      res.render("invoice",{proData, findOrder})
+      
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+  
+
+
+
+
+
 
 
 
@@ -753,6 +787,7 @@ module.exports = {
     renderEditAddress,
     loadshop,
     addToWallet,
+    loadInvoice
     
     
     
