@@ -6,7 +6,7 @@ const Product = require('../model/productmodel');
 const addressModel = require('../model/addressmodel');
 const cartmodel = require('../model/cartmodel');
 const categoryModel=require('../model/categorymodel');
-const wishlistModel = require('../model/wishlistModel');
+const wishlistModel = require('../model/wishlistmodel');
 const Order=require('../model/ordermodel')
 
 
