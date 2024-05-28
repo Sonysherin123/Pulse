@@ -14,8 +14,8 @@ const generateDate = require("../util/dategenerater");
 
 
 var instance = new Razorpay({
-  key_id: 'rzp_test_xaGkIpXmOWb28y',
-  key_secret: '7l3JbQrUmZdZ8tocVjWSV07y',
+ key_id: process.env.key_id,
+  key_secret: process.env.key_secret,
 });
 
 
