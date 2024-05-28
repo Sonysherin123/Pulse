@@ -1,7 +1,7 @@
 // const Product = require("../model/productmodel");
 const Product = require('../model/productmodel');
 const userModel = require('../model/userModel');
-const Wishlist=require('../model/wishlistModel');
+const Wishlist=require('../model/wishlistmodel');
 
 const User = require("../model/userModel");
 
