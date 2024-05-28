@@ -758,110 +758,52 @@
                                         </div>
                                     </div> 
                                     <br><br>
-
-
                                     <!-- your-order-wrap end -->
                                     <div class="payment-option">
-                                        <h3
-                                            style="color: #000000; font-size: 18px; font-weight: 600; text-transform: uppercase; margin-left: 40px;">
+                                        <h3 style="color: #000000; font-size: 18px; font-weight: 600; text-transform: uppercase; margin-left: 40px;">
                                             Payment Options
                                         </h3>
-                                        <!-- <div class="custome-radio mt-2"> -->
-                                             <!-- <%if((cartData.total) <=1000){%>  -->
-                                              
-                                                <!-- <input class="form-check-input" required type="radio"
-                                                    name="payment_option" id="razorpay" value="Razorpay">
-                                                <label class="form-check-label" for="razorpay" data-bs-toggle="collapse"
-                                                    data-target="#bankTranfer" aria-controls="bankTranfer"
-                                                    style="font-size: 15px; font-weight: 500;">
-                                                    <span class="me-3"><i class="bi bi-credit-card"
-                                                            style="opacity: 0.5;"></i></span>
-                                                    Razorpay</label> -->
-                                                <!-- <%}else{%>
-                                                    <p style="margin-left: 40px; font-size: 15px; font-weight: 500;">
-                                                        Order above Rs 1000 is not applicable for COD</p>
-                                                    <input class="form-check-input" required type="radio"
-                                                        name="payment_option" id="razorpay" value="Razorpay"
-                                                        style="margin-left: 40px;" checked>
-                                                    <label class="form-check-label" for="razorpay"
-                                                        data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                        aria-controls="bankTranfer"
-                                                        style="font-size: 15px; font-weight: 500;">
-                                                        <span class="me-3"><i class="bi bi-credit-card"
-                                                                style="opacity: 0.5;"></i>
-                                                            Razorpay</label>
-                                                    <%}%> -->
-
-<!-- 
-                                                        <div class="form-group collapse in" id="bankTranfer">
-                                                            <p class="text-muted mt-5">There are many variations of
-                                                                passages of Lorem
-                                                                Ipsum available, but the majority have suffered
-                                                                alteration. </p>
-                                                        </div> -->
-                                        <!-- </div> -->
-                                       
-                                    <%if(cartData.total <=1000){%>
-                                        <input class="form-check-input" required="" type="radio"
-                                        name="payment_option" id="cashOnDelivery" value="Cash On Delivery"
-                                        checked>
-                                    <label class="form-check-label" for="cashOnDelivery"
-                                        data-bs-toggle="collapse" data-target="#bankTranfer"
-                                        aria-controls="bankTranfer"
-                                        style="font-size: 15px; font-weight: 500;"><span class="me-3"></span>
-                                        Cash on Delivery
-                                    </label>
-
-                                    <input class="form-check-input" required type="radio"
-                                                    name="payment_option" id="razorpay" value="Razorpay">
-                                                <label class="form-check-label" for="razorpay" data-bs-toggle="collapse"
-                                                    data-target="#bankTranfer" aria-controls="bankTranfer"
-                                                    style="font-size: 15px; font-weight: 500;">
-                                                    <span class="me-3"><i class="bi bi-credit-card"
-                                                            style="opacity: 0.5;"></i></span>
+                                        <div class="custome-radio mt-2">
+                                            <% if (cartData.total <= 1000) { %>
+                                                <input class="form-check-input" required type="radio" name="payment_option" id="cashOnDelivery" value="Cash On Delivery" checked>
+                                                <label class="form-check-label" for="cashOnDelivery" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer" style="font-size: 15px; font-weight: 500;">
+                                                    <span class="me-3"><img src="/assets/images/payment pic/cash-on-delivery.png" style="height: 16px; width: 15px; align-items: center; opacity: 0.5;" alt=""></span>
+                                                    Cash on Delivery
                                                 </label>
-                                                <label>Razorpay</label>
-                                                    
-                                                <%}else{%>
-                                                    <p style="margin-left: 40px; font-size: 15px; font-weight: 500;">
-                                                        Order above Rs 1000 is not applicable for COD</p>
-                                                    <input class="form-check-input" required type="radio"
-                                                        name="payment_option" id="razorpay" value="Razorpay"
-                                                        style="margin-left: 40px;" checked>
-                                                    <label class="form-check-label" for="razorpay"
-                                                        data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                        aria-controls="bankTranfer"
-                                                        style="font-size: 15px; font-weight: 500;">
-                                                        <span class="me-3"><i class="bi bi-credit-card"
-                                                                style="opacity: 0.5;"></i>
-                                                            Razorpay</label>
-                                                    <%}%>
-
-
-                                                        <div class="form-group collapse in" id="bankTranfer">
-                                                            <p class="text-muted mt-5">There are many variations of
-                                                                passages of Lorem
-                                                                Ipsum available, but the majority have suffered
-                                                                alteration. </p>
-                                                        </div>
+                                                <input class="form-check-input" required type="radio" name="payment_option" id="razorpay" value="Razorpay">
+                                                <label class="form-check-label" for="razorpay" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer" style="font-size: 15px; font-weight: 500;">
+                                                    <span class="me-3"><i class="bi bi-credit-card" style="opacity: 0.5;"></i></span>
+                                                    Razorpay
+                                                </label>
+                                            <% } else { %>
+                                                <p style="margin-left: 40px; font-size: 15px; font-weight: 500;">
+                                                    Order above Rs 1000 is not applicable for COD
+                                                </p>
+                                                <input class="form-check-input" required type="radio" name="payment_option" id="razorpay" value="Razorpay" style="margin-left: 40px;" checked>
+                                                <label class="form-check-label" for="razorpay" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer" style="font-size: 15px; font-weight: 500;">
+                                                    <span class="me-3"><i class="bi bi-credit-card" style="opacity: 0.5;"></i></span>
+                                                    Razorpay
+                                                </label>
+                                            <% } %>
                                         </div>
-
-
+                                    
+                                        <div class="form-group collapse in" id="bankTranfer">
+                                            <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration.</p>
+                                        </div>
+                                    
                                         <div class="order-button-payment">
-                                            <input onclick="placeOrder('<%= cartData._id%>')" type="submit"
-                                                value="Place order" />
+                                            <input onclick="placeOrder('<%= cartData._id %>')" type="submit" value="Place order" />
                                         </div>
                                     </div>
-                                    <!-- your-order-wrapper start -->
-
+                <!-- checkout-details-wrapper end -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- checkout-details-wrapper end -->
             </div>
         </div>
+    
         <!-- main-content-wrap end -->
 
         <!-- footer Start -->
@@ -1009,7 +951,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
+<!-- 
     <script>
 
 
@@ -1079,7 +1021,7 @@
                     
                     if (response.status === true) {
                         
-                        window.location.href = `/orderPlaced?id=${response.orders.orderNumber}`;
+                        window.location.href = `/orderPlaced?id=${response.order.orderNumber}`;
                        
                     }
                     else if (response.status === "fill the options") {
@@ -1150,9 +1092,102 @@
                     }
                 
             })
-        }
+        } -->
 
 
+        <script>
+            let addressId;
+            let index;
+        
+            function handleAddressSelection(radioButton, i) {
+                if (radioButton.checked) {
+                    addressId = radioButton.value;
+                    index = i;
+                }
+            }
+        
+            let selectedPaymentOption = '';
+            document.querySelectorAll('input[name="payment_option"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    if (this.checked) {
+                        selectedPaymentOption = this.value;
+                        console.log(selectedPaymentOption + " is selected");
+                    }
+                });
+            });
+        
+            function placeOrder(cartid) {
+                const code = document.getElementById("Code").value;
+                let paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
+                alert(paymentOption)
+                const totalDis = document.getElementById("cartSubtotal").innerHTML.trim();
+        
+                $.ajax({
+                    url: "/checkOutData",
+                    method: "post",
+                    data: {
+                        addressId,
+                        cartid,
+                        index,
+                        paymentOption,
+                        code,
+                        totalDis
+                    },
+                    success: (response) => {
+                        if (response.status === true) {
+                            window.location.href = `/orderPlaced?id=${response.order.orderNumber}`;
+                        } else if (response.status === "fill the options") {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Must fill the Options",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        } else if (response.status === "razorpay") {
+                            alert("hrrvg")
+                            let orderId = response.order.id;
+                            let address = response.address;
+                            let amount = response.total;
+                            let couponCode = response.code;
+                            let order_num = response.orderNumber;
+        
+                            var options = {
+                                "key": "rzp_test_xaGkIpXmOWb28y",
+                                "amount": response.order.amount,
+                                "currency": "INR",
+                                "name": "PULSE",
+                                "description": "Test Transaction",
+                                "image": "assets/images/logo/cc.png",
+                                "order_id": response.order.id,
+                                "handler": function (response) {
+                                    verifyPayment(response, orderId, addressId, amount, couponCode, order_num, index);
+                                },
+                                "prefill": {
+                                    "name": "Gaurav Kumar",
+                                    "email": "gaurav.kumar@example.com",
+                                    "contact": "9000090000"
+                                },
+                                "notes": {
+                                    "address": "Razorpay Corporate Office"
+                                },
+                                "theme": {
+                                    "color": "#333"
+                                }
+                            };
+                            var rzp1 = new Razorpay(options);
+        
+                            rzp1.open();
+                            rzp1.on('payment.failed', function (response) {
+                                paymentFailed(amount, address, couponCode, index);
+                            });
+                        }
+                    }
+                });
+            }
+        
+            
+            
+        
         function verifyPayment(payment, order, addressId, amount, couponCode, order_num, index) {
             $.ajax(
                 {
@@ -1169,7 +1204,7 @@
                     },
                     success: (response) => {
                         if (response.status == true) {
-                            window.location.href = `/orderPlaced?id=${response.orders.orderNumber}`
+                            window.location.href = `/orderPlaced?id=${response.order.orderNumber}`
                         }
                     }
                 }
@@ -1193,17 +1228,12 @@
                     index
                 },
                 success: (response) => {
-                    if (response.status == "paymentfail") {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Payment Failed",
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            setTimeout(() => {
-                                window.location.href = `/order`;
-                            }, 1500); 
-                        });
+                    if (response.status ===200) {
+                        
+                        
+                                window.location.href = `/orderPlaced?id=${response.order.orderNumber}`
+                          
+                        
                     }
                 }
             })

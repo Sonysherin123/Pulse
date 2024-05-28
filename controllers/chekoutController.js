@@ -406,7 +406,7 @@ const paymentFailed =  async(req,res)=>{
         
       });
       const pay = await orderData.save();
-      res.json({status:"paymentfail"})
+      res.json({status:200,order:orderData})
   }catch(error){
     console.log(error.message);
   }

@@ -102,88 +102,151 @@ const loadEdit = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-
 const editProduct = async (req, res) => {
     try {
-
-        console.log("edddiittt ooooooooooooooooooooooooooooo")
-
-        let existingImages = [];
         const existingProduct = await Product.findById(req.query.id);
-        console.log(existingProduct,'xxxxxxxxxxxxxdxdrdr');
         const categorydetails = await categoryModel.find();
-        console.log(categorydetails,'ccccccccccccccccccccccccccccccccccccccccccccccccccccccc');
 
         // Existing images are retained unless new images are uploaded
-        if (existingProduct && existingProduct.images && Array.isArray(existingProduct.images)) {
-            existingImages = existingProduct.images;
-        }
-        console.log(req.body,'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
-        console.log(existingImages,"exxxxxxxxisintftftfcfcfrcft");
+        let existingImages = existingProduct.images || [];
         let newImages = [];
-        // Process new images if any
+
         if (req.files && req.files.length) {
             newImages = req.files.map(file => file.filename);
         }
 
-        console.log(newImages,"newwwwwwimage");
-
         const allImages = existingImages.concat(newImages);
-        console.log(allImages,"alllllimage");
+        if (allImages.length > 3) {
+            return res.render('editproduct', {
+                catData: categorydetails,
+                proData: existingProduct,
+                message: 'Maximum 3 images per product',
+            });
+        }
 
-        // Limit images to 3
-        // if (newImages.length !==0) {
-        //     return res.render('editproduct', { catData: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
-        // } else {
-            console.log("else workinggg");
-            // Update the product with new data
-            const updatedProduct = await Product.findByIdAndUpdate(req.query.id, {
-                $set: {
-                    name: req.body.name,
-                    description: req.body.description,
-                    images: allImages,
-                    category: req.body.category,
-                    price: req.body.price,
-                    discountPrice: req.body.discountPrice, // Ensure this field exists in your schema
-                    countInStock: req.body.stock,
-                }
-            }, { new: true }); // {new: true} to return the updated object
+        const updatedProduct = await Product.findByIdAndUpdate(req.query.id, {
+            name: req.body.name,
+            description: req.body.description,
+            images: allImages,
+            category: req.body.category,
+            price: req.body.price,
+            discountPrice: req.body.discountPrice,
+            countInStock: req.body.stock,
+        }, { new: true });
 
-            if (updatedProduct) {
-                console.log("update product");
-                return res.redirect('/admin/productlist');
-            }
-        // }
+        if (updatedProduct) {
+            return res.redirect('/admin/productlist');
+        }
     } catch (error) {
         console.log('update product:', error.message);
         res.status(500).send('An error occurred');
     }
 };
+
 const deleteimage = async (req, res) => {
     try {
         const id = req.query.id;
         const del = req.query.delete;
 
         const product = await Product.findById(id);
-        console.log(product, del, id);
-
-        if (del) {
+        if (product) {
             const index = product.images.indexOf(del);
             if (index !== -1) {
                 product.images.splice(index, 1);
-                // Save the updated product to the database
                 await product.save();
             }
         }
 
-        res.redirect('/admin/edit-pro?id=' + id);
+        res.redirect(`/admin/edit-pro?id=${id}`);
     } catch (err) {
         console.log(err.message);
-        // Handle errors appropriately, perhaps send an error response
         res.status(500).send("Error deleting image");
     }
-}
+};
+
+
+
+
+// const editProduct = async (req, res) => {
+//     try {
+
+//         console.log("edddiittt ooooooooooooooooooooooooooooo")
+
+//         let existingImages = [];
+//         const existingProduct = await Product.findById(req.query.id);
+//         console.log(existingProduct,'xxxxxxxxxxxxxdxdrdr');
+//         const categorydetails = await categoryModel.find();
+//         console.log(categorydetails,'ccccccccccccccccccccccccccccccccccccccccccccccccccccccc');
+
+//         // Existing images are retained unless new images are uploaded
+//         if (existingProduct && existingProduct.images && Array.isArray(existingProduct.images)) {
+//             existingImages = existingProduct.images;
+//         }
+//         console.log(req.body,'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+//         console.log(existingImages,"exxxxxxxxisintftftfcfcfrcft");
+//         let newImages = [];
+//         // Process new images if any
+//         if (req.files && req.files.length) {
+//             newImages = req.files.map(file => file.filename);
+//         }
+
+//         console.log(newImages,"newwwwwwimage");
+
+//         const allImages = existingImages.concat(newImages);
+//         console.log(allImages,"alllllimage");
+
+//         // Limit images to 3
+//         // if (newImages.length !==0) {
+//         //     return res.render('editproduct', { catData: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
+//         // } else {
+//             console.log("else workinggg");
+//             // Update the product with new data
+//             const updatedProduct = await Product.findByIdAndUpdate(req.query.id, {
+//                 $set: {
+//                     name: req.body.name,
+//                     description: req.body.description,
+//                     images: allImages,
+//                     category: req.body.category,
+//                     price: req.body.price,
+//                     discountPrice: req.body.discountPrice, // Ensure this field exists in your schema
+//                     countInStock: req.body.stock,
+//                 }
+//             }, { new: true }); // {new: true} to return the updated object
+
+//             if (updatedProduct) {
+//                 console.log("update product");
+//                 return res.redirect('/admin/productlist');
+//             }
+//         // }
+//     } catch (error) {
+//         console.log('update product:', error.message);
+//         res.status(500).send('An error occurred');
+//     }
+// };
+// const deleteimage = async (req, res) => {
+//     try {
+//         const id = req.query.id;
+//         const del = req.query.delete;
+
+//         const product = await Product.findById(id);
+//         console.log(product, del, id);
+
+//         if (del) {
+//             const index = product.images.indexOf(del);
+//             if (index !== -1) {
+//                 product.images.splice(index, 1);
+//                 // Save the updated product to the database
+//                 await product.save();
+//             }
+//         }
+
+//         res.redirect('/admin/edit-pro?id=' + id);
+//     } catch (err) {
+//         console.log(err.message);
+//         // Handle errors appropriately, perhaps send an error response
+//         res.status(500).send("Error deleting image");
+//     }
+// }
 
 const Loadproduct = async(req,res)=>{
     try{

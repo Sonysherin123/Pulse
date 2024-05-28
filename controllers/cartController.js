@@ -452,200 +452,314 @@ const removeCart = async (req, res) => {
 //     }
 // };
 
+// const addOrder = async (req, res) => {
+//     try {
+        
+//         const { addressId, cartid, checkedOption,paymentOption,totalDis,code } = req.body;
+        
+
+//         const findCoupon = await Coupon.findOne({couponCode:code})
+//          console.log(findCoupon);
+
+//         if(!addressId || !paymentOption){
+//             res.json({status:"fill the options"})
+//         }
+//         else if(paymentOption == "Cash On Delivery"){
+//             const userData = await User.findById(req.session.user);
+//             console.log('req.session.user');
+//             const cartData = await Cart.findOne({ userId: userData._id });
+//             console.log("dfghjkl")
+    
+//             const pdtData = [];
+    
+//             for (let i = 0; i < cartData.items.length; i++) {
+//                 pdtData.push(cartData.items[i]);
+//             }
+    
+//             const orderNum = generateOrder.generateOrder();
+    
+//             const addressData = await Address.findOne({ "address._id": addressId });
+//             console.log(addressData);
+
+//             const index = addressData.address.findIndex(addr => addr._id === addressId);
+//             const address = addressData.address[index];
+
+//             if (index === -1) {
+//                 // Handle case when address is not found
+//                 console.log('Address not found');
+//             } else {
+//                 const address = addressData.address[index];
+//                 // Proceed with your logic using the found address
+//             }
+
+//             console.log();
+    
+//             const date = generateDate()
+
+
+//             for (const item of cartData.items) {
+//                 const product = await Product.findById(item.productId);
+//                 product.countInStock -= item.quantity; 
+//                 await product.save();
+//             }
+
+//               if(cartData.coupon){
+//                 const orderData = new order({
+//                     userId: userData._id,
+//                     orderNumber: orderNum,
+//                     userEmail: userData.email,
+//                     items: pdtData,
+//                     totalAmount:totalDis,
+//                     orderType: paymentOption,
+//                     orderDate: date,
+//                     status: "Processing",
+//                     shippingAddress: [...addressData.address],
+//                     coupon : cartData.coupon,
+//                     discount : cartData.discount
+//                 });
+        
+//                 await orderData.save();
+
+
+//                 const updateCoupon = await Coupon.findByIdAndUpdate({_id:findCoupon._id},
+//                     {
+//                         $push:{
+//                             users : userData._id
+//                         }
+//                     })
+        
+//                     res.json({ status: true, order: orderData });
+//                     await Cart.findByIdAndDelete({ _id: cartData._id });
+        
+//               }
+//               else{
+//                 const orderData = new order({
+//                     userId: userData._id,
+//                     orderNumber: orderNum,
+//                     userEmail: userData.email,
+//                     items: pdtData,
+//                     totalAmount:totalDis,
+//                     orderType: paymentOption,
+//                     orderDate: date,
+//                     status: "Processing",
+//                     shippingAddress: [...addressData.address],
+                    
+//                 });
+        
+//                 await orderData.save();
+
+//                 res.json({ status: true, order: orderData });
+//             await Cart.findByIdAndDelete({ _id: cartData._id });
+//               }
+    
+            
+    
+    
+            
+    
+//         }
+//         else if(paymentOption == "Razorpay"){
+//             const userData = await User.findById(req.session.user);
+//             const cartData = await Cart.findOne({ userId: userData._id });
+            
+//             const pdtData = [];
+    
+//             for (let i = 0; i < cartData.items.length; i++) {
+//                 pdtData.push(cartData.items[i]);
+//             }
+    
+//             const orderNum = generateOrder.generateOrder();
+//             const stringOrder_id=orderNum.toString()
+//             const addressData = await Address.findOne({ "address._id": addressId });
+//             let address = addressData.address[index]
+//             const date = generateDate()
+        
+//             // for (const item of cartData.items) {
+//             //     const product = await Product.findById(item.productId);
+//             //     product.countInStock -= item.quantity; // Reduce countInStock by the ordered quantity
+//             //     await product.save();
+//             //     // console.log(product,"saved");
+//             // }
+
+//             var options = {
+//                 amount: totalDis * 100,
+//                 currency: "INR",
+//                 receipt: stringOrder_id
+//               };
+
+//               let amount = Number(totalDis)
+           
+//               instance.orders.create(options, function(err, razpayOrder) {
+//                 if(!err){
+//                     console.log(razpayOrder ,"order razooo");
+//                     res.json({status:"razorpay",order:razpayOrder,orderNumber:orderNum,total:amount,code:code,address:addressId})
+//                 }
+//                 else{                   
+//                      console.log("error else ");
+
+//                     console.error(err.message);
+//                 }
+//               });
+//         }
+        
+
+
+
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
 const addOrder = async (req, res) => {
     try {
+        const { addressId, cartid, checkedOption, paymentOption, totalDis, code } = req.body;
         
-        const { addressId, cartid, checkedOption,paymentOption,totalDis,code } = req.body;
-        
+        // Find coupon by code
+        const findCoupon = await Coupon.findOne({ couponCode: code });
+        console.log('Found Coupon:', findCoupon);
 
-        const findCoupon = await Coupon.findOne({couponCode:code})
-         console.log(findCoupon);
+        if (!addressId || !paymentOption) {
+            return res.json({ status: "fill the options" });
+        } 
 
-        if(!addressId || !paymentOption){
-            res.json({status:"fill the options"})
-        }
-        else if(paymentOption == "Cash On Delivery"){
+        if (paymentOption === "Cash On Delivery") {
             const userData = await User.findById(req.session.user);
-            console.log()
-            const cartData = await Cart.findOne({ userId: userData._id });
-    
-            const pdtData = [];
-    
-            for (let i = 0; i < cartData.items.length; i++) {
-                pdtData.push(cartData.items[i]);
+            if (!userData) {
+                return res.status(404).json({ message: 'User not found' });
             }
-    
-            const orderNum = generateOrder.generateOrder();
-    
-            const addressData = await Address.findOne({ "address._id": addressId });
-            console.log();
-    
-            let address = addressData.address[index]
-            console.log(addressData);
-    
-            const date = generateDate()
 
+            const cartData = await Cart.findOne({ userId: userData._id });
+            if (!cartData) {
+                return res.status(404).json({ message: 'Cart not found' });
+            }
+
+            console.log("User Data:", userData);
+            console.log("Cart Data:", cartData);
+
+            const pdtData = cartData.items.map(item => item);
+            const orderNum = generateOrder.generateOrder();
+
+            const addressData = await Address.findOne({ "address._id": addressId });
+            if (!addressData) {
+                return res.status(404).json({ message: 'Address not found' });
+            }
+
+            // console.log('Address Data:', addressData);
+
+            const index = addressData.address.findIndex(addr => addr._id.toString() === addressId.toString());
+            console.log(index,'index');
+            if (index === -1) {
+                return res.status(404).json({ message: 'Address index not found' });
+            }
+            
+
+            const address = addressData.address[index];
+            console.log('Shipping Address:', address);
+
+            const date = generateDate();
+            console.log(date+'date');
 
             for (const item of cartData.items) {
                 const product = await Product.findById(item.productId);
-                product.countInStock -= item.quantity; 
-                await product.save();
+                if (product) {
+                    product.countInStock -= item.quantity;
+                    await product.save();
+                }
             }
-
-              if(cartData.coupon){
-                const orderData = new order({
-                    userId: userData._id,
-                    orderNumber: orderNum,
-                    userEmail: userData.email,
-                    items: pdtData,
-                    totalAmount:totalDis,
-                    orderType: paymentOption,
-                    orderDate: date,
-                    status: "Processing",
-                    shippingAddress: [...addressData.address],
-                    coupon : cartData.coupon,
-                    discount : cartData.discount
-                });
-        
-                await orderData.save();
-
-
-                const updateCoupon = await Coupon.findByIdAndUpdate({_id:findCoupon._id},
-                    {
-                        $push:{
-                            users : userData._id
-                        }
-                    })
-        
-                    res.json({ status: true, order: orderData });
-                    await Cart.findByIdAndDelete({ _id: cartData._id });
-        
-              }
-              else{
-                const orderData = new order({
-                    userId: userData._id,
-                    orderNumber: orderNum,
-                    userEmail: userData.email,
-                    items: pdtData,
-                    totalAmount:totalDis,
-                    orderType: paymentOption,
-                    orderDate: date,
-                    status: "Processing",
-                    shippingAddress: [...addressData.address],
-                    
-                });
-        
-                await orderData.save();
-
-                res.json({ status: true, order: orderData });
-            await Cart.findByIdAndDelete({ _id: cartData._id });
-              }
-    
             
-    
-    
+            const orderData = new order({
+                userId: userData._id,
+                orderNumber: orderNum,
+                userEmail: userData.email,
+                items: pdtData,
+                totalAmount: totalDis,
+                orderType: paymentOption,
+                orderDate: date,
+                status: "Processing",
+                shippingAddress: address,
+                coupon: cartData.coupon || undefined,
+                discount: cartData.discount || undefined
+            });
+
+            await orderData.save();
             
-    
-        }
-        else if(paymentOption == "Razorpay"){
+
+            
+
+            cartData.items=[]
+            await cartData.save();
+            console.log('updated');
+            return res.json({ status: true, order: orderData });
+
+        } else if (paymentOption === "Razorpay") {
+            console.log("razorpayyyyyyyyyyyyyyyyyyyyyyyyyy");
             const userData = await User.findById(req.session.user);
-            const cartData = await Cart.findOne({ userId: userData._id });
-            
-            const pdtData = [];
-    
-            for (let i = 0; i < cartData.items.length; i++) {
-                pdtData.push(cartData.items[i]);
+            console.log(userData);
+            if (!userData) {
+                return res.status(404).json({ message: 'User not found' });
             }
-    
-            const orderNum = generateOrder.generateOrder();
-            const stringOrder_id=orderNum.toString()
-            const addressData = await Address.findOne({ "address._id": addressId });
-            let address = addressData.address[index]
-            const date = generateDate()
-        
-            // for (const item of cartData.items) {
-            //     const product = await Product.findById(item.productId);
-            //     product.countInStock -= item.quantity; // Reduce countInStock by the ordered quantity
-            //     await product.save();
-            //     // console.log(product,"saved");
-            // }
 
-            var options = {
+            const cartData = await Cart.findOne({ userId: userData._id });
+            if (!cartData) {
+                return res.status(404).json({ message: 'Cart not found' });
+            }
+
+            // console.log("User Data:", userData);
+            console.log("Cart Data:", cartData);
+
+            const pdtData = cartData.items.map(item => item);
+            const orderNum = generateOrder.generateOrder();
+            const stringOrder_id = orderNum.toString();
+
+            const addressData = await Address.findOne({ "address._id": addressId });
+            if (!addressData) {
+                return res.status(404).json({ message: 'Address not found' });
+            }
+
+            console.log(addressData);
+
+            const index = addressData.address.findIndex(addr => addr._id.toString() === addressId.toString());
+            if (index === -1) {
+                return res.status(404).json({ message: 'Address not found' });
+            }
+
+            console.log(index,"indx");
+
+            const address = addressData.address[index];
+            console.log('Shipping Address:', address);
+
+            const date = generateDate();
+            const options = {
                 amount: totalDis * 100,
                 currency: "INR",
                 receipt: stringOrder_id
-              };
+            };
 
-              let amount = Number(totalDis)
-           
-              instance.orders.create(options, function(err, razpayOrder) {
-                if(!err){
-                    console.log(razpayOrder ,"order razooo");
-                    res.json({status:"razorpay",order:razpayOrder,orderNumber:orderNum,total:amount,code:code,address:addressId})
+            instance.orders.create(options, function(err, razpayOrder) {
+                if (!err) {
+                    console.log('Razorpay Order:', razpayOrder);
+                    return res.json({
+                        status: "razorpay",
+                        order: razpayOrder,
+                        orderNumber: orderNum,
+                        total: totalDis,
+                        code: code,
+                        address: addressId
+                    });
+                } else {
+                    console.error('Razorpay Error:', err.message);
+                    return res.status(500).json({ message: 'Razorpay order creation failed' });
                 }
-                else{                   
-                     console.log("error else ");
-
-                    console.error(err.message);
-                }
-              });
+            });
+        } else {
+            return res.status(400).json({ message: 'Invalid payment option' });
         }
-        
-
-
-
     } catch (error) {
-        console.log(error);
+        console.error('Error in addOrder:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
-// const addOrder = async (req, res) => {
-//     try {
-//         const { addressId, cartid, checkedOption, paymentOption, totalDis, code, index } = req.body;
 
-//         if (!addressId || !paymentOption) {
-//             return res.json({ status: "fill the options" });
-//         }
 
-//         let findCoupon = null;
-//         if (code) {
-//             findCoupon = await Coupon.findOne({ couponCode: code });
-//             if (!findCoupon) {
-//                 return res.json({ status: "Coupon not found" });
-//             }
-//         }
-
-//         let userData = null;
-//         if (req.session.user) {
-//             userData = await User.findById(req.session.user);
-//             if (!userData) {
-//                 return res.json({ status: "User not found" });
-//             }
-//         } else {
-//             return res.json({ status: "User session not found" });
-//         }
-
-//         const cartData = await Cart.findOne({ userId: userData._id });
-//         if (!cartData) {
-//             return res.json({ status: "Cart not found" });
-//         }
-
-//         const addressData = await Address.findOne({ "address._id": addressId });
-//         if (!addressData) {
-//             return res.json({ status: "Address not found" });
-//         }
-
-//         const address = addressData.address[index];
-//         const date = generateDate();
-
-//     //   const orders=await ordermodel.findOne({})
-
-//         res.json({ status: true, message: "Order placed successfully",orders });
-
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ status: "error", message: "Internal server error" });
-//     }
-// };
 
 
 const loadorderPlaced = async (req, res) => {

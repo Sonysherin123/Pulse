@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 // Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/PULSE")
+mongoose.connect(process.env.MONGODB)
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -16,7 +16,7 @@ const bodyParser = require('body-parser')
 const session=require('express-session');
 const nocache=require('nocache');
 const app = express();
-const PORT =  7272 ;
+const PORT = process.env.PORT ||7272 ;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
