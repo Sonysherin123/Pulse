@@ -64,7 +64,7 @@ var instance = new Razorpay({
 const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
-        console.log(userId);
+        
         let userCart = await Cart.findOne({ userId: userId }).populate({ path: 'items.productId', model: 'products' }) || null;
 
         console.log(userCart);
@@ -148,14 +148,14 @@ const loadCartinWish = async (req, res) => {
                 });
             }
 
-            // Update total in cart
+            
             userCart.total = userCart.items.reduce((total, item) => total + item.subTotal, 0);
         }
 
-        // Save or update the user's cart
+        
         await userCart.save();
 
-        // Remove the product from the wishlist if it was added to the cart
+        
         await Wishlist.findOneAndUpdate({ user_id: userId }, { $pull: { products: { productId: productId } } });
 
         // Redirect to the cart page

@@ -19,9 +19,9 @@ const createCategory = async (req, res) => {
         console.log("create cat");
        
         const name = req.body.name;
-        console.log(name)
+        
         const dis = req.body.description;
-        console.log(dis)
+        
         const existingcate = await Category.findOne({
         
             name: name.toLowerCase(),

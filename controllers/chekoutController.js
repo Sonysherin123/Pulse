@@ -1,4 +1,5 @@
 const User = require("../model/userModel");
+require('dotenv').config();
 // const Product = require("../model/productmodel");
 const  Product= require('../model/productmodel');
 const Cart = require("../model/cartmodel");
@@ -46,7 +47,7 @@ const loadCheckOutPage = async (req, res) => {
 const razopayment = async (req, res) => {
   try {
     const { payment, order, addressId, order_num, amount, couponCode, index } = req.body;
-    // console.log(req.body);
+    
     const findCoupon = await coupon.findOne({ couponCode: couponCode });
 
     let hmac = crypto.createHmac("sha256", '7l3JbQrUmZdZ8tocVjWSV07y');
@@ -104,9 +105,7 @@ const razopayment = async (req, res) => {
 
       res.json({ status: true, order: savedOrder });
     } 
-    // else {
-    //   res.status(400).json({ error: "Razorpay signature verification failed." });
-    // }
+    
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "Internal server error." });
