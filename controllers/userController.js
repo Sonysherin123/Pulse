@@ -258,7 +258,7 @@ const loaduserprofile = async(req,res)=>{
             { 'userId': req.session.user }
         );
 
-        res.render('userProfile', { userData,address});
+        res.render('userprofile', { userData,address});
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
