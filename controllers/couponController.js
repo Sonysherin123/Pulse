@@ -63,7 +63,6 @@ const loadEditCoupon=async(req,res)=>{
     try {
         const id=req.query.id
         const findCoupon=await Coupon.findById({_id:id})
-        console.log(id)
         res.render("editCoupon",{findCoupon})
     } catch (error) {
         console.log(error.messagge)
@@ -74,7 +73,7 @@ const editCoupon=async(req,res)=>{
         const{Minimum,startDate,nameValue,endDate,maximum,discount}=req.body
         
           const id=req.body.id
-          console.log();
+          
        
         const couponData= await Coupon.findOneAndUpdate({_id:id},{
             $set:{
@@ -241,11 +240,11 @@ const removeCoupon = async (req, res) => {
     try {
         const { id } = req.body;
 
-        // Find the cart by ID
+        
         const findCart = await Cart.findOne({ _id: id });
 
         if (findCart && findCart.coupon) {
-            // Reset the coupon-related fields in the cart
+            
             findCart.coupon = null;
             findCart.discount = 0;
             await findCart.save();
