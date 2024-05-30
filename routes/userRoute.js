@@ -84,7 +84,7 @@ user_route.get('/wishlist',wishlistController.loadWishlist);
  user_route.get('/checkOutData',auth.isLogin,checkoutController.loadCheckOutPage);
  user_route.post('/checkOutData', auth.checkAuth, cartController.addOrder);
 
- user_route.get("/coupon", auth.checkAuth,couponController.loadCoupon);
+user_route.get("/coupon", auth.checkAuth,couponController.loadCoupon);
 user_route.post("/applyCoupon",  auth.checkAuth, couponController.applyCoupon);
 user_route.post('/remove_coupon',couponController.removeCoupon); 
 user_route.post("/verify-payment",auth.checkAuth,checkoutController.razopayment);

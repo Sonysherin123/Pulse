@@ -116,15 +116,21 @@ const razopayment = async (req, res) => {
   
 const loadWallet = async (req, res) => {
   try {
-    console.log(req.session.user);
     const userWallet = await Wallet.findOne({ userId: req.session.user });
-    console.log('.......',userWallet);
-    res.render("wallet", { userWallet })
-  }
-  catch (error) {
+
+    if (userWallet && userWallet.transactions) {
+      userWallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    res.render("wallet", { userWallet });
+  } catch (error) {
     console.log(error.message);
+    res.status(500).send("Internal Server Error");
   }
-}
+};
+
+
+
 
 
 

@@ -752,7 +752,7 @@
                                                     id="remove" style="display: none;" onclick="remove('<%= cartData._id %>')" type="submit">
                                                 <br><br>
                                                 <div style=" justify-content: center;">
-                                                    <a href="/coupon" class="btn button" id="show">Available Coupons</a>
+                                                    <button onclick="coupon('<%=cartData._id%>')" class="btn button" id="show">Available Coupons</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -1096,6 +1096,16 @@
 
 
         <script>
+
+function coupon(id) {
+ window.location.href=`/coupon?id=${id}`
+}
+
+
+
+
+
+
             let addressId;
             let index;
         

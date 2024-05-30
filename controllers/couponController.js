@@ -3,6 +3,7 @@ const Coupon = require("../model/couponmodel");
 const Cart = require("../model/cartmodel");
 const User = require("../model/userModel")
 const generateDate = require("../util/dategenerater");
+const cartmodel = require('../model/cartmodel');
 
 
 const loadCouponPage = async (req,res)=>{
@@ -102,26 +103,34 @@ const editCoupon=async(req,res)=>{
 
 const loadCoupon = async (req, res) => {
     try {
-      const findUser = await User.findById(req.session.user);
+      const id = req.query.id;
   
-      
+      const cart = await cartmodel.findOne({ userId: req.session.user });
+      if (!cart) {
+        throw new Error('Cart not found for the user.');
+      }
   
+      const cartTotal = cart.total;
+  
+
       const CouponDataArray = await Coupon.find({
-        users: { $nin: [findUser._id] },
-        isActive: true
+        users: { $nin: [req.session.user] },
+        isActive: true,
+        minimumAmount: { $lte: cartTotal }  
+        ,maximumAmount:{$gte:cartTotal}
       });
   
       const redeemCoupon = await Coupon.find({
-        users: { $in: [findUser._id] },
+        users: { $in: [req.session.user] }
       });
-  
-      // console.log(readeemCoupon);
   
       res.render("coupon", { CouponDataArray, redeemCoupon });
     } catch (error) {
-      console.log('Error in coupon:',error.message);
+      console.log('Error in coupon:', error.message);
+      res.status(500).send('Internal Server Error');
     }
   };
+  
   
 //const blockCoupon = async (req,res)=>{
 //     try{
