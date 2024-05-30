@@ -393,18 +393,18 @@ const saveOrder = async (req, res) => {
 
     console.log('Order found:', checking);
 
-    // Check if the status is already the same
+    
     if (checking.status === status) {
       console.log('Order status is already the same:', status);
       return res.json({ status: "notChanged" });
     }
 
-    // Update order status first
+    
     checking.status = status;
     await checking.save();
     console.log(`Order status updated to: ${status}`);
 
-    // Process cancellation and refund if status is "Cancelled"
+    
     if (status === "Canceled") {
       console.log("Processing cancelled order");
 
@@ -443,7 +443,7 @@ const saveOrder = async (req, res) => {
       }
     }
 
-    // Handle other status updates
+    
     if (status === "Returned") {
       console.log("Processing returned order");
 
@@ -561,7 +561,7 @@ const saveOrder = async (req, res) => {
 //     }
 const returnRequest = async (req, res) => {
   try {
-    console.log('hi');
+    
       const { id, reason } = req.body;
       const findOrder = await order.findByIdAndUpdate(
           id,

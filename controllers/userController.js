@@ -53,41 +53,41 @@ const insertUser = async (req, res) => {
         const { name, email, mobileno, userpassword, confirmpassword } = req.body;
         console.log(name,email,mobileno,userpassword,confirmpassword);
 
-        // Check if the email already exists in the database
+        
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             
             return res.render('registration',{error:'Email already exists. Please use a different email.'});
         }
 
-        // If passwords match, proceed with user registration
+    
         if (userpassword === confirmpassword) {
-            // Generate OTP and timestamp
+
             const otp = generateOTP();
             console.log(otp,"otp");
             const otpTimestamp = Date.now();
             console.log(otpTimestamp,'time');
 
-            // Store user data and OTP in session
+        
             req.session.Data = { name, email, mobileno, userpassword, confirmpassword, otp, otpTimestamp };
             console.log(req.session.Data,"data saved");
            
-            // Send OTP to user's email
+            
             const sentEmailUser = await sendInsertOtp(email, otp);
             console.log(sentEmailUser,"emailsent");
             if (sentEmailUser) {
                 console.log("inside sent email");
-                // Redirect to OTP verification page
+                
                 return res.redirect('/otp');
             }
         } else {
             console.log("else worked in email sent");
-            // If passwords don't match, render the register page with an error message
+            
             return res.render('registration', { error: 'Passwords do not match.' });
         }
     } catch (error) {
         console.log(error.message);
-        // Handle any errors that occur during registration
+        
         return res.render('registration', { error: 'An error occurred. Please try again later.' });
     }
 }

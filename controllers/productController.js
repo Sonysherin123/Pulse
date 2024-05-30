@@ -86,16 +86,16 @@ console.log('hi');
 
 const loadEdit = async (req, res) => {
     try {
-        // Extract the product ID from the request query
+        
         const id = req.query.id;
 
-        // Retrieve the product data using the Product model
+        
         const proData = await Product.findById(id);
 
-        // Retrieve the category data using the Category model
+        
         const catData = await categoryModel.find({});
 
-        // Render the editProduct page with the retrieved data
+        
         res.render("editProduct", { catData, proData });
     } catch (error) {
         console.log(error.message);
@@ -107,7 +107,7 @@ const editProduct = async (req, res) => {
         const existingProduct = await Product.findById(req.query.id);
         const categorydetails = await categoryModel.find();
 
-        // Existing images are retained unless new images are uploaded
+        
         let existingImages = existingProduct.images || [];
         let newImages = [];
 

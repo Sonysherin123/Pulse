@@ -57,11 +57,11 @@
             <div class="d-md-flex justify-content-between">
                 <div>
                     <p class="textc">Invoice To</p>
-                    <h4><%= findOrder.shippingAddress.name %></h4>
+                    <h4><%= findOrder.shippingAddress[0].name %></h4>
                     <ul class="list-unstyled">
                         <li><%= findOrder.userEmail %></li>
-                        <li><%= findOrder.address %></li>
-                        <li><%= findOrder.city %></li>
+                        <li><%= findOrder.shippingAddress[0].homeAddress %></li>
+                        <li><%= findOrder.shippingAddress[0].city %></li>
                     </ul>
                 </div>
                 <div class="mt-5 mt-md-0">

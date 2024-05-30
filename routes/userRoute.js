@@ -53,7 +53,7 @@ user_route.get('/resetPassword',auth.isLogin,userController.loadresetpassword);
 
  user_route.get('/cart',auth.isLogin,cartController.loadCart);
  user_route.post('/addCart',cartController.add_to_cart);
- user_route.post('/cartadd',  cartController.increment);
+ user_route.post('/cartadd',  cartController  .increment);
  user_route.post('/decrement', cartController.decrement);
  user_route.post('/pro-del', cartController.removeCart);
  user_route.post("/addCartLoad", cartController.loadCartinWish);
