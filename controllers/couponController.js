@@ -63,7 +63,7 @@ const loadEditCoupon=async(req,res)=>{
     try {
         const id=req.query.id
         const findCoupon=await Coupon.findById({_id:id})
-        res.render("editCoupon",{findCoupon})
+        res.render("editcoupon",{findCoupon})
     } catch (error) {
         console.log(error.messagge)
     }

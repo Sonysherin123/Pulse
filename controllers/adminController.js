@@ -569,7 +569,7 @@ const addOfferLoad=async(req,res)=>{
             const catData = await Category.find({
                 is_active: true });
                 console.log(catData,"catdata");
-            res.render("addOffer",{catData})
+            res.render("addoffer",{catData})
         } catch (error) {
            console.log(error.message) 
         }
