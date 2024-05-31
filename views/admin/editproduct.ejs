@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>PULSE Dashboard</title>
@@ -12,14 +13,19 @@
     <link href="admin-assets/css/main.css" rel="stylesheet" type="text/css" />
     <style>
         .existing-image img {
-            max-width: 150px; /* Adjust the max-width as per your preference */
-            max-height: 150px; /* Adjust the max-height as per your preference */
-            margin-bottom: 5px; /* Optional: Add some space below each image */
+            max-width: 150px;
+            /* Adjust the max-width as per your preference */
+            max-height: 150px;
+            /* Adjust the max-height as per your preference */
+            margin-bottom: 5px;
+            /* Optional: Add some space below each image */
         }
-    
+
         .existing-image button {
-            margin-top: 5px; /* Optional: Add some space above the delete button */
+            margin-top: 5px;
+            /* Optional: Add some space above the delete button */
         }
+
         .preview-image {
             display: flex;
             flex-wrap: wrap;
@@ -57,6 +63,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
@@ -94,19 +101,20 @@
                 <li class="menu-item ">
                     <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Category</span>
-                    </a>                   
+                    </a>
                 </li>
                 <li class="menu-item ">
-                    <a class="menu-link" href="/admin/catagoryOffer"> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="/admin/catagoryOffer"> <i
+                            class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Category Offer</span>
-                    </a>                   
+                    </a>
                 </li>
                 <li class="menu-item ">
                     <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Coupons</span>
-                    </a>                   
+                    </a>
                 </li>
-               
+
                 <li class="menu-item ">
                     <a class="menu-link" href="/admin/sales"> <i class="icon material-icons md-store"></i>
                         <span class="text">Sales Report</span>
@@ -115,11 +123,12 @@
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
                         <span class="text">Account</span>
-                    </a>                    
+                    </a>
                 </li>
-                
-               
-            </ul>  </aside>
+
+
+            </ul>
+    </aside>
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
@@ -206,7 +215,8 @@
                         </div>
                         <div class="card-body">
                             <!-- Form content -->
-                            <form action="" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                            <form action="" method="post" enctype="multipart/form-data"
+                                onsubmit="return validateForm()">
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Name</label>
                                     <input type="text" class="form-control" name="name" id="product_name"
@@ -215,8 +225,8 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="product_description" class="form-label">Description</label>
-                                    <input type="text" class="form-control" name="description" id="product_description" value="<%= proData.description %>"
-                                        rows="4">
+                                    <input type="text" class="form-control" name="description" id="product_description"
+                                        value="<%= proData.description %>" rows="4">
                                     <p id="descriptionError" class="text-danger"></p>
                                 </div>
                                 <div class="row">
@@ -231,11 +241,13 @@
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label for="discount_price" class="form-label">Discount Price</label>
-                                            <input placeholder="₹" type="text" class="form-control" name="discountPrice" id="discount_price">
-                                            <p id="discountPriceError" class="text-danger"></p> <!-- Placeholder for discount price error -->
+                                            <input placeholder="₹" type="text" class="form-control" name="discountPrice"
+                                                id="discount_price">
+                                            <p id="discountPriceError" class="text-danger"></p>
+                                            <!-- Placeholder for discount price error -->
                                         </div>
                                     </div>
-                                   
+
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label for="stock_count" class="form-label">Count of Stock</label>
@@ -244,80 +256,85 @@
                                             <p id="stockError" class="text-danger"></p>
                                         </div>
                                     </div>
-                             
+
 
                                     <div class="mb-4">
                                         <label for="category" class="form-label">Category</label>
                                         <select class="form-select" id="category" name="category">
-                                            <% if(catData.length > 0) {
+                                            <% if(catData.length> 0) {
                                                 for(let i=0; i<catData.length; i++) { %>
-                                                    <option value="<%=catData[i]._id%>"><%=catData[i].name%></option>
-                                                <% }
-                                            } %>
+                                                    <option value="<%=catData[i]._id%>">
+                                                        <%=catData[i].name%>
+                                                    </option>
+                                                    <% } } %>
                                         </select>
-                                        <div id="categoryError" class="text-danger"></div> <!-- Placeholder for category error -->
+                                        <div id="categoryError" class="text-danger"></div>
+                                        <!-- Placeholder for category error -->
                                     </div>
-                                    
-                                     
+
+
                                 </div>
-                               
-                               
-                                    </div> 
-                               
-                            <div class="mb-4">
-                                <label for="existing_images" class="form-label">Existing Images</label>
-                                <div id="existing_images_container">
-                                    <% proData.images.forEach(image => { %>
-                                        <div class="existing-image">
-                                            <img src="/uploads/productImages/<%=image %>" alt="Existing Image">
-                                            <a href="/admin/deleteImage?id=<%=proData._id%>&delete=<%=image %>">Delete</a>
-                                        </div>
-                                    <% }) %>
-                                </div>
-                            </div>
-                            <!-- Media Section for Images -->
-                            <div class="mb-4">
-                                <!-- File input for images -->
-                                <div class="preview-image" id="preview_image"></div>
-                                <input type="file" class="form-control" name="images" id="product_images" multiple>
-                                <div id="imagesError"></div>
-                                <div id="existing_images_container"></div>
-                                <small class="form-text text-muted">You can select multiple images.</small>
-                                <p id="imagesError" class="text-danger"></p> <!-- Placeholder for images error -->
-                            </div>
-                            <div class="mb-4">
-                                <button type="submit" class="btn btn-primary">Update Product</button>
-                            </div>
-                            <input type="hidden" id="images" value="<%=proData.images.length%>">
-                            
-                            <!-- Image Preview and Crop Modal -->
-                            <div class="modal" id="imageCropModal" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Crop Image</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="img-container">
-                                                <img id="cropImage" src="">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="button" class="btn btn-primary" id="cropAndSave">Crop and Save</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                           
+
+
                         </div>
-                    </div> <!-- card end// -->
-                    <div class="card mb-4">
-                        
-                    </div> <!-- card end// -->
-                </div>
+
+                        <div class="mb-4">
+                            <label for="existing_images" class="form-label">Existing Images</label>
+                            <div id="existing_images_container">
+                                <% proData.images.forEach(image=> { %>
+                                    <div class="existing-image">
+                                        <img src="/uploads/productImages/<%=image %>" alt="Existing Image">
+                                        <a href="/admin/deleteImage?id=<%=proData._id%>&delete=<%=image %>">Delete</a>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                        </div>
+                        <!-- Media Section for Images -->
+                        <div class="mb-4">
+                            <!-- File input for images -->
+                            <div class="preview-image" id="preview_image"></div>
+                            <input type="file" class="form-control" name="images" id="product_images" multiple>
+                            <div id="imagesError"></div>
+                            <div id="existing_images_container"></div>
+                            <small class="form-text text-muted">You can select multiple images.</small>
+                            <p id="imagesError" class="text-danger"></p> <!-- Placeholder for images error -->
+                        </div>
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary">Update Product</button>
+                        </div>
+                        <input type="hidden" id="images" value="<%=proData.images.length%>">
+
+                        <!-- Image Preview and Crop Modal -->
+                        <div class="modal" id="imageCropModal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Crop Image</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="img-container">
+                                            <img id="cropImage" src="">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="cropAndSave">Crop and
+                                            Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div> <!-- card end// -->
+                <div class="card mb-4">
+
+                </div> <!-- card end// -->
+            </div>
             </div>
         </section> <!-- content-main end// -->
         <footer class="main-footer font-xs">
@@ -331,18 +348,18 @@
     <script src="admin-assets/js/vendors/jquery.fullscreen.min.js"></script>
     <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
-                            
+
     <!-- Main Script -->
     <script src="admin-assets/js/main.js" type="text/javascript"></script>
     <!-- Validation Script -->
     <script>
-        
+
         document.getElementById('regular_price').addEventListener('blur', validateRegularPrice);
-    
-        
+
+
         document.getElementById('stock_count').addEventListener('blur', validateStockCount);
-    
-        
+
+
         function validateRegularPrice() {
             var regularPrice = document.getElementById('regular_price').value.trim();
             if (regularPrice === '' || isNaN(regularPrice) || regularPrice < 0) {
@@ -353,8 +370,8 @@
                 return true;
             }
         }
-    
-        
+
+
         function validateStockCount() {
             var stockCount = document.getElementById('stock_count').value.trim();
             if (stockCount === '' || isNaN(stockCount) || stockCount < 0) {
@@ -365,114 +382,124 @@
                 return true;
             }
         }
-    
-        
+
+
         function validateForm() {
-            
+
             document.getElementById('nameError').textContent = '';
             document.getElementById('descriptionError').textContent = '';
             document.getElementById('categoryError').textContent = '';
             document.getElementById('imagesError').textContent = '';
-    
-            
+
+
             var productName = document.getElementById('product_name').value.trim();
+            // alert(productName)
             if (productName === '') {
                 document.getElementById('nameError').textContent = 'Please enter a product name';
                 return false;
             }
-    
-            
+
+
             var productDescription = document.getElementById('product_description').value.trim();
+            // alert(productDescription)
+
             if (productDescription === '') {
                 document.getElementById('descriptionError').textContent = 'Please enter a product description';
                 return false;
             }
-    
-            document.getElementById('product_images').addEventListener('change', function () {
-    validateAndPreviewImages();
-});
 
-function validateAndPreviewImages() {
-    var existingImagesCount = parseInt(document.getElementById('images').value);
-    var imagesInput = document.getElementById('product_images').files;
-    var imagesError = document.getElementById('imagesError');
-
-     
-     var totalImages = existingImagesCount + imagesInput.length;
-
-
-if (totalImages === 0) {
-    imagesError.textContent = 'Please select at least one image';
-    return false;
-} else if (totalImages > 3) {
-    imagesError.textContent = 'You can upload up to three images only';
-    return false;
-}
-  
-    var validFormats = ['jpg', 'jpeg', 'png', 'gif'];
-    var maxSize = 2 * 1024 * 1024; // 2MB
-    for (var i = 0; i < imagesInput.length; i++) {
-        var file = imagesInput[i];
-        var fileName = file.name.toLowerCase();
-        var extension = fileName.split('.').pop();
-
-        if (!validFormats.includes(extension)) {
-            imagesError.textContent = 'Invalid image format. Please upload images in JPG, JPEG, PNG, or GIF format';
-            return false;
-        }
-        if (file.size > maxSize) {
-            imagesError.textContent = 'Image size should be less than 2MB';
-            return false;
-        }
-    }
-}
-    imagesError.textContent = '';
-    previewImages(imagesInput);
-
-
-function previewImages(images) {
-    var imageContainer = document.getElementById('existing_images_container');
-    imageContainer.innerHTML = ''; 
-    for (var i = 0; i < images.length; i++) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var imgDiv = document.createElement('div');
-            imgDiv.classList.add('existing-image');
-            var img = document.createElement('img');
-            img.src = e.target.result;
-            img.alt = 'Image Preview';
-            img.style.cursor = 'pointer';
-            img.addEventListener('click', function () {
-                openCropModal(e.target.result);
-            });
-            imgDiv.appendChild(img);
-            imageContainer.appendChild(imgDiv);
-        };
-        reader.readAsDataURL(images[i]);
-    }
-}
-    
-    
-           
+            var fileInput = document.getElementById('product_images');
+           if (fileInput) {
+            fileInput.addEventListener('change', function () {
             
-           
+                validateAndPreviewImages();
+            });
+        } else {
+            console.error("Element with ID 'product_images' not found.");
+        }
+            function validateAndPreviewImages() {
+                var existingImagesCount = parseInt(document.getElementById('images').value);
+                var imagesInput = document.getElementById('product_images').files;
+                var imagesError = document.getElementById('imagesError');
+
+                alert(existingImagesCount)
+                alert(imagesInput.length)
+
+                var totalImages = existingImagesCount + imagesInput.length;
+
+
+                if (totalImages === 0) {
+                    imagesError.textContent = 'Please select at least one image';
+                    return false;
+                } else if (totalImages > 3) {
+                    imagesError.textContent = 'You can upload up to three images only';
+                    return false;
+                }
+
+                var validFormats = ['jpg', 'jpeg', 'png', 'gif'];
+                var maxSize = 2 * 1024 * 1024; // 2MB
+                for (var i = 0; i < imagesInput.length; i++) {
+                    var file = imagesInput[i];
+                    var fileName = file.name.toLowerCase();
+                    var extension = fileName.split('.').pop();
+
+                    if (!validFormats.includes(extension)) {
+                        imagesError.textContent = 'Invalid image format. Please upload images in JPG, JPEG, PNG, or GIF format';
+                        return false;
+                    }
+                    if (file.size > maxSize) {
+                        imagesError.textContent = 'Image size should be less than 2MB';
+                        return false;
+                    }
+                }
+            }
+            imagesError.textContent = '';
+            previewImages(imagesInput);
+
+
+            function previewImages(images) {
+                var imageContainer = document.getElementById('existing_images_container');
+                imageContainer.innerHTML = '';
+                for (var i = 0; i < images.length; i++) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var imgDiv = document.createElement('div');
+                        imgDiv.classList.add('existing-image');
+                        var img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Image Preview';
+                        img.style.cursor = 'pointer';
+                        img.addEventListener('click', function () {
+                            openCropModal(e.target.result);
+                        });
+                        imgDiv.appendChild(img);
+                        imageContainer.appendChild(imgDiv);
+                    };
+                    reader.readAsDataURL(images[i]);
+                }
+            }
+
+
+
+
+
             if (!validateRegularPrice() || !validateStockCount() || !validateAndPreviewImages()) {
                 return false;
             }
-    
-            
+
+
             return true;
         }
 
-        document.getElementById('product_images').addEventListener('change', function(event) {
+        document.getElementById('product_images').addEventListener('change', function (event) {
             var files = event.target.files;
             var previewContainer = document.getElementById('preview_image');
-            previewContainer.innerHTML = ''; 
+            previewContainer.innerHTML = '';
 
-            Array.from(files).forEach(function(file, index) {
+            Array.from(files).forEach(function (file, index) {
                 if (file.type.startsWith('image/')) {
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         var wrapper = document.createElement('div');
                         wrapper.classList.add('image-wrapper');
 
@@ -483,7 +510,7 @@ function previewImages(images) {
                         var deleteButton = document.createElement('button');
                         deleteButton.innerHTML = '&times;';
                         deleteButton.classList.add('delete-button');
-                        deleteButton.addEventListener('click', function() {
+                        deleteButton.addEventListener('click', function () {
                             wrapper.remove();
                         });
 
@@ -495,7 +522,8 @@ function previewImages(images) {
             });
         });
     </script>
-    
-    
+
+
 </body>
+
 </html>
