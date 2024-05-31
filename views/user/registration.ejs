@@ -853,10 +853,9 @@ function enableGenerateButton() {
     var nameInput = document.getElementById("name");
     var name = nameInput.value.trim();
 
-    // Name must start with a capital letter followed by lowercase letters
+    
     var nameRegex = /^[A-Z][a-z]*(\s[A-Z][a-z]*)*$/;
 
-    // No space allowed at the beginning of the name
     if (nameInput.value.charAt(0) === ' ') {
         showError("name", "Name must not start with a space.");
     } else if (!nameRegex.test(name)) {
@@ -903,9 +902,9 @@ function enableGenerateButton() {
         function validateMobile() {
     var mobileInput = document.getElementById("mobileno");
     var mobile = mobileInput.value.trim();
-    var mobileRegex = /^[6|9]\d{9}$/; // Must start with 6 or 9 and be exactly 10 digits long
+    var mobileRegex = /^[8|9]\d{9}$/; // Must start with 6 or 9 and be exactly 10 digits long
     if (!mobileRegex.test(mobile)) {
-        showError("mobileno", "Mobile number must start with 6 or 9 and be 10 digits long.");
+        showError("mobileno", "Mobile number must start with 8 or 9 and be 10 digits long.");
     } else {
         hideError("mobileno");
     }
