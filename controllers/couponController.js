@@ -9,7 +9,7 @@ const cartmodel = require('../model/cartmodel');
 const loadCouponPage = async (req,res)=>{
     try{
         const couponData =await Coupon.find({});
-        res.render('adminCoupon',{couponData})
+        res.render('admincoupon',{couponData})
     }
     catch(error){
         console.log(error.message);
@@ -17,7 +17,7 @@ const loadCouponPage = async (req,res)=>{
 }
 const loadAddCoupon = async (req,res)=>{
     try{
-        res.render('addCoupon');
+        res.render('addcoupon');
     }
     catch(error){
         console.log(error.message);

@@ -70,7 +70,7 @@ const loadViewOrder = async (req, res) => {
       // Format expected delivery date to "dd-mm-yyyy" format
       const formattedDeliveryDate = `${expectedDeliveryDate.getDate()}-${expectedDeliveryDate.getMonth() + 1}-${expectedDeliveryDate.getFullYear()}`;
   
-      res.render("orderView", { pdtData, findOrder ,expectedDeliveryDate: formattedDeliveryDate})
+      res.render("orderview", { pdtData, findOrder ,expectedDeliveryDate: formattedDeliveryDate})
     }
     catch (error) {
       console.log(error.message);
