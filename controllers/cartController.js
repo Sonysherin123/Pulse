@@ -10,6 +10,7 @@ const generateOrder = require("../util/otphandle")
 const Coupon=require('../model/couponmodel');
 const Razorpay=require('razorpay');
 const ordermodel = require("../model/ordermodel");
+const walletmodel = require("../model/walletmodel");
 
 var instance = new Razorpay({
     key_id: 'rzp_test_xaGkIpXmOWb28y',
@@ -615,7 +616,7 @@ const addOrder = async (req, res) => {
         
         // Find coupon by code
         const findCoupon = await Coupon.findOne({ couponCode: code });
-        console.log('Found Coupon:', findCoupon);
+       
 
         if (!addressId || !paymentOption) {
             return res.json({ status: "fill the options" });
@@ -750,7 +751,85 @@ const addOrder = async (req, res) => {
                     return res.status(500).json({ message: 'Razorpay order creation failed' });
                 }
             });
-        } else {
+        }else if (paymentOption === 'wallet') {
+         
+            const wallet = await walletmodel.findOne({ userId: req.session.user});
+            const userData = await User.findById(req.session.user);
+        
+            const cartData = await Cart.findOne({ userId: userData._id });    
+            if (wallet && wallet.balance >= cartData.total) {
+
+                
+            if (!cartData) {
+                return res.status(404).json({ message: 'Cart not found' });
+            }
+
+            // console.log("User Data:", userData);
+            console.log("Cart Data:", cartData);
+
+            const pdtData = cartData.items.map(item => item);
+            const orderNum = generateOrder.generateOrder();
+            const stringOrder_id = orderNum.toString();
+
+            const addressData = await Address.findOne({ "address._id": addressId });
+            if (!addressData) {
+                return res.status(404).json({ message: 'Address not found' });
+            }
+
+            console.log(addressData);
+
+            const index = addressData.address.findIndex(addr => addr._id.toString() === addressId.toString());
+            if (index === -1) {
+                return res.status(404).json({ message: 'Address not found' });
+            }
+
+            console.log(index,"indx");
+
+            const address = addressData.address[index];
+            console.log('Shipping Address:', address);
+
+            const date = generateDate();
+                
+                const orderData = new order({
+                    userId: req.session.user._id,
+                    orderNumber: orderNum,
+                    userEmail: req.session.user.email,
+                    items: cartData.items,  
+                    totalAmount: cartData.total,
+                    orderType: paymentOption,
+                    orderDate: date,
+                    status: "Processing",
+                    shippingAddress: address,
+                    coupon: cartData.coupon || undefined,
+                    discount: cartData.discount || undefined
+                });
+        
+                // Save the order data
+                await orderData.save();
+        
+                // Deduct the order total from the wallet balance
+                wallet.balance -= cartData.total;
+        
+                // Add a transaction record to the wallet
+                wallet.transactions.push({
+                    id: wallet.transactions.length + 1, // Ensure unique transaction ID
+                    date: new Date().toISOString(),
+                    amount: cartData.total,
+                    orderType: paymentOption,
+                    type: 'Debit'
+                });
+        
+                // Save the updated wallet data
+                await wallet.save();
+        
+                // Send a response back to the client
+                res.status(200).json({ status: true, order: orderData });
+            } else {
+                res.status(400).json({ status: false, message: "Insufficient wallet balance" });
+            }
+        }
+        
+         else {
             return res.status(400).json({ message: 'Invalid payment option' });
         }
     } catch (error) {
@@ -777,7 +856,7 @@ const loadorderPlaced = async (req, res) => {
         for (let i = 0; i < pdt.length; i++) {
             pdtData.push(await Product.findById({ _id: pdt[i] }))
         }
-        res.render('orderPlaced', { orders, pdtData })
+        res.render('orderplaced', { orders, pdtData })
 
     } catch (error) {
         console.log(error.message);

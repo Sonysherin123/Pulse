@@ -784,6 +784,13 @@
                                                     <span class="me-3"><i class="bi bi-credit-card" style="opacity: 0.5;"></i></span>
                                                     Online Payment
                                                 </label>
+                                                <input class="form-check-input" required type="radio" name="payment_option" id="wallet" value="wallet" style="margin-left: 40px;" checked>
+
+                                                <label class="form-check-label" for="wallet" data-bs-toggle="collapse" data-target="#walletPayment" aria-controls="walletPayment" style="font-size: 15px; font-weight: 500;">
+                                                    <span class="me-3"><i class="bi bi-wallet" style="opacity: 0.5;"></i></span>
+                                                    Wallet Payment
+                                                </label>
+                                                
                                             <% } %>
                                         </div>
                                     
@@ -1097,6 +1104,7 @@
 
         <script>
 
+
 function coupon(id) {
  window.location.href=`/coupon?id=${id}`
 }
@@ -1127,73 +1135,82 @@ function coupon(id) {
             });
         
             function placeOrder(cartid) {
-                const code = document.getElementById("Code").value;
-                let paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
-                alert(paymentOption)
-                const totalDis = document.getElementById("cartSubtotal").innerHTML.trim();
-        
-                $.ajax({
-                    url: "/checkOutData",
-                    method: "post",
-                    data: {
-                        addressId,
-                        cartid,
-                        index,
-                        paymentOption,
-                        code,
-                        totalDis
+    const code = document.getElementById("Code").value;
+    let paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
+    alert(paymentOption);
+    const totalDis = document.getElementById("cartSubtotal").innerHTML.trim();
+
+    $.ajax({
+        url: "/checkOutData",
+        method: "post",
+        data: {
+            addressId,
+            cartid,
+            index,
+            paymentOption,
+            code,
+            totalDis
+        },
+        success: (response) => {
+            if (response.status === true) {
+                window.location.href = `/orderPlaced?id=${response.order.orderNumber}`;
+            } else if (response.status === "fill the options") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Must fill the Options",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else if (response.status === "razorpay") {
+               
+                let orderId = response.order.id;
+                let address = response.address;
+                let amount = response.total;
+                let couponCode = response.code;
+                let order_num = response.orderNumber;
+
+                var options = {
+                    "key": "rzp_test_xaGkIpXmOWb28y",
+                    "amount": response.order.amount,
+                    "currency": "INR",
+                    "name": "PULSE",
+                    "description": "Test Transaction",
+                    "image": "assets/images/logo/cc.png",
+                    "order_id": response.order.id,
+                    "handler": function (response) {
+                        verifyPayment(response, orderId, addressId, amount, couponCode, order_num, index);
                     },
-                    success: (response) => {
-                        if (response.status === true) {
-                            window.location.href = `/orderPlaced?id=${response.order.orderNumber}`;
-                        } else if (response.status === "fill the options") {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Must fill the Options",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        } else if (response.status === "razorpay") {
-                            alert("hrrvg")
-                            let orderId = response.order.id;
-                            let address = response.address;
-                            let amount = response.total;
-                            let couponCode = response.code;
-                            let order_num = response.orderNumber;
-        
-                            var options = {
-                                "key": "rzp_test_xaGkIpXmOWb28y",
-                                "amount": response.order.amount,
-                                "currency": "INR",
-                                "name": "PULSE",
-                                "description": "Test Transaction",
-                                "image": "assets/images/logo/cc.png",
-                                "order_id": response.order.id,
-                                "handler": function (response) {
-                                    verifyPayment(response, orderId, addressId, amount, couponCode, order_num, index);
-                                },
-                                "prefill": {
-                                    "name": "Gaurav Kumar",
-                                    "email": "gaurav.kumar@example.com",
-                                    "contact": "9000090000"
-                                },
-                                "notes": {
-                                    "address": "Razorpay Corporate Office"
-                                },
-                                "theme": {
-                                    "color": "#333"
-                                }
-                            };
-                            var rzp1 = new Razorpay(options);
-        
-                            rzp1.open();
-                            rzp1.on('payment.failed', function (response) {
-                                paymentFailed(amount, address, couponCode, index);
-                            });
-                        }
+                    "prefill": {
+                        "name": "Gaurav Kumar",
+                        "email": "gaurav.kumar@example.com",
+                        "contact": "9000090000"
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#333"
                     }
+                };
+                var rzp1 = new Razorpay(options);
+
+                rzp1.open();
+                rzp1.on('payment.failed', function (response) {
+                    paymentFailed(amount, address, couponCode, index);
+                });
+            } else if (response.message === "Insufficient wallet balance") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Insufficient Wallet Balance",
+                    text: "Your wallet balance is not sufficient to complete this order. Please choose another payment method.",
+                    showConfirmButton: true,
                 });
             }
+        }
+    });
+}
+
+          
         
             
             
