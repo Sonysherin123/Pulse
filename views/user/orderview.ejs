@@ -784,7 +784,7 @@
                                         </tr>
                                         <tr>
                                             <td colspan="2">Shipping</td>
-                                           <% if(pdttotal>2000){%>
+                                           <% if(pdttotal>=2000){%>
                                             <td class="text-end">₹100.00</td>
                                            <% }else{%>
                                                 <td class="text-end">₹0.00</td>
@@ -1493,7 +1493,7 @@ function cancelReturn(orderId) {
                                 <a href="/productDetails?id=${element._id}" class="product-link">
                                     <img src="/productAssets/${element.images[0]}" alt="product">
                                     <div class="product-info">
-                                        <p>${element.pname}</p>
+                                        <p>${element.name}</p>
                                         <p>₹${element.offprice}</p>
                                     </div>
                                 `;
@@ -1590,7 +1590,7 @@ function cancelReturn(orderId) {
 
 
         function continuePayment(id){
-            // alert(id)
+            alert(id)
             $.ajax({
                 url:"/continuePayment",
                 method:"post",

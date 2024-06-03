@@ -12,11 +12,12 @@ const Wallet=require('../model/walletmodel');
 const generateOrder = require("../util/otphandle")
 const Razorpay = require('razorpay');
 const generateDate = require("../util/dategenerater");
+const { log } = require("console");
 
 
 var instance = new Razorpay({
- key_id: process.env.key_id,
-  key_secret: process.env.key_secret,
+  key_id: 'rzp_test_xaGkIpXmOWb28y',
+  key_secret: '7l3JbQrUmZdZ8tocVjWSV07y',
 });
 
 
@@ -289,29 +290,34 @@ const continuePayment = async (req,res)=>{
   try{
   
     const id=req.body.id
+    console.log(id);
     
     const findOrder=await Order.findById(id)
+    console.log(findOrder);
   
     const pdtData = [];
 
      
 
     const stringOrder_id=findOrder.orderNumber.toString()
+    console.log(stringOrder_id);
 
     var options={
       amount:findOrder.totalAmount*100,
       currency:"INR",
       receipt:stringOrder_id
     }
+    console.log(options);
 
-    instance.orders.create(options,async(error,razorpayOrder)=>{
- 
+   instance.orders.create(options,async(error,razorpayOrder)=>{
       if(!error){
-    
+        console.log("if");
         res.json({status:true,order:razorpayOrder,orderId:findOrder._id})
         findOrder.status='Processing'
         await findOrder.save();
+        
       }else{
+        console.log(razorpayOrder);
         console.error(error);
       }
     })

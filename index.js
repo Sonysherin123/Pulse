@@ -53,6 +53,10 @@ app.use('/',userRoute);
 //for admin
 app.use('/admin',adminRoute);
 
+app.get('*',function(req,res){
+res.render('404page')
+})
+
 
 
 

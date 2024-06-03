@@ -32,7 +32,7 @@ const checkAuth = (req, res, next) => {
         next();
     } else {
         // User is not logged in, redirect to login page
-        res.redirect('/login');
+        res.redirect('/');
     }
 };
 
