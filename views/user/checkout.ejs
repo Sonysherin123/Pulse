@@ -958,36 +958,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<!-- 
-    <script>
 
 
-        let addressId;
-        let index;
-
-        function handleAddressSelection(radioButton, i) {
-            if (radioButton.checked) {
-                addressId = radioButton.value;
-                index = i
-
-
-            }
-
-        }
+        
 
 
 
-
-
-        let selectedPaymentOption = '';
-        document.querySelectorAll('input[name="payment_option"]').forEach(function (radio) {
-            radio.addEventListener('change', function () {
-                if (this.checked) {
-                    selectedPaymentOption = this.value;
-                    console.log(selectedPaymentOption + "is selected");
-                }
-            })
-        })
 
 
 
@@ -999,107 +975,6 @@
 
 
 
-        function placeOrder(cartid) {
-
-            //    alert(addressId)
-            //    alert(cartid)
-            //    alert(index)
-            //    alert(checkedOption)
-            const code = document.getElementById("Code").value
-            let paymentOption = document.querySelector('input[name="payment_option"]:checked').value
-           
-           
-            const totalDis = document.getElementById("cartSubtotal").innerHTML.trim()
-            alert(totalDis)
-            $.ajax({
-                url: "/checkOutData",
-                method: "post",
-                data: {
-                    addressId,
-                    cartid,
-                    index,
-                    paymentOption,
-                    totalDis,
-                    code,
-                    
-
-                },
-                success: (response) => {
-                    
-                    if (response.status === true) {
-                        
-                        window.location.href = `/orderPlaced?id=${response.order.orderNumber}`;
-                       
-                    }
-                    else if (response.status === "fill the options") {
-
-                        Swal.fire({
-
-                            icon: "error",
-                            title: "Must fill the Options",
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-
-                    }
-                    else if (response.status === "razorpay") {
-
-                        let orderId = response.order.id;
-                        let address = response.address
-                        let amount = response.total
-                        let couponCode = response.code
-                        let order_num = response.orderNumber
-
-                        // alert(orderId)
-                        // alert(address)
-                        // alert(amount)
-                        // alert(couponCode)
-                        // alert(order_num)
-                        var options = {
-                            "key": "rzp_test_xaGkIpXmOWb28y",
-                            "amount": response.order.amount,
-                            "currency": "INR",
-                            "name": "PULSE",
-                            "description": "Test Transaction",
-                            "image": "assets/images/logo/cc.png",
-                            "order_id": response.order.id,
-                            "handler": function (response) {
-                                // alert(response.razorpay_payment_id);
-                                // alert(response.razorpay_order_id);
-                                // alert(response.razorpay_signature)
-                                // alert(orderId)
-                                // alert(addressId)
-                                // alert(order_num)
-                                // alert(index)
-                                verifyPayment(response, orderId, addressId, amount, couponCode, order_num, index)
-                            },
-                            "prefill": {
-                                "name": "Gaurav Kumar",
-                                "email": "gaurav.kumar@example.com",
-                                "contact": "9000090000"
-                            },
-                            "notes": {
-                                "address": "Razorpay Corporate Office"
-                            },
-                            "theme": {
-                                "color": "#333"
-                            }
-                        };
-                        var rzp1 = new Razorpay(options);
-
-                        rzp1.open()
-                        rzp1.on('payment.failed', function (response) {
-                    paymentFailed(amount, address, couponCode, index);
-                });
-                        }
-
-
-
-                    
-                    }
-                
-            })
-        } -->
 
 
         <script>
@@ -1137,7 +1012,7 @@ function coupon(id) {
             function placeOrder(cartid) {
     const code = document.getElementById("Code").value;
     let paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
-    alert(paymentOption);
+
     const totalDis = document.getElementById("cartSubtotal").innerHTML.trim();
 
     $.ajax({
@@ -1241,10 +1116,7 @@ function coupon(id) {
 
 
         function paymentFailed(amount, address, couponCode, index) {
-            // alert(amount);
-            // alert(address)
-            // alert(couponCode)
-            // alert(index)
+            
             $.ajax({
                 url: "/paymentfailed",
                 method: "post",

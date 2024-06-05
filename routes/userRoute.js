@@ -45,8 +45,11 @@ user_route.post('/edit-address',userController.editAddress);
 user_route.get('/deleteAddress',auth.isLogin,userController.deleteAddress);
 
 
-user_route.get('/resetPassword',auth.isLogin,userController.loadresetpassword);
-// user_route.post('/resetPassword', userController.loadresetpassword);
+user_route.get('/resetPassword',userController.loadresetpassword);
+user_route.post('/resetPassword', userController.resetpassword);
+
+user_route.get('/forgotPassword', userController.loadForgotPassword);
+user_route.post('/forgotPassword', userController.forgotPassword);
 
 
 

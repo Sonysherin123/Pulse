@@ -46,8 +46,23 @@ const loadLogin = async(req,res)=>{
         console.log(error.message);
     }
 }
+console.log(error.message)
 
 
+
+
+
+
+
+
+const resetpassword=async()=>{
+try{
+
+}
+catch(err){
+
+}
+}
 const insertUser = async (req, res) => {
     try {
         const { name, email, mobileno, userpassword, confirmpassword } = req.body;
@@ -434,6 +449,49 @@ const deleteAddress = async (req, res) => {
     }
 };
 
+const loadForgotPassword = async (req, res) => {
+    try {
+        res.render('forgotPassword')
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+
+const forgotPassword = async (req, res) => {
+    try {
+        const email = req.body.email;
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.render('forgotPassword', { message: "Email not found", email: email });
+
+        }
+
+        const otp = generateOTP();
+
+       
+        //    req.session.save();
+
+        const sentEmail = await sendInsertOtp(req.body.email, otp);
+        req.session.forgotPassword = {
+            email: req.body.email,
+            otp: otp
+        }
+        
+            res.redirect('/resetPassword')
+        
+
+    }
+    catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+
+
 
 const loadresetpassword = async(req,res)=>{
 try{
@@ -442,119 +500,7 @@ try{
     console.log(error);
 }
 };
-// const loadshop = async (req, res) => {
-//     try {
- 
-//         const product = await Product.find().populate('category');
 
-//         const categories = await categoryModel.find();
-
-//         res.render('shop', { product, categories });
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
-
-// const loadshop = async (req, res) => {
-//     try {
-//         const sortby = req.query.sortby || null;
-//         const category = req.query.category || null;
-
-//         const perPage = 8;
-//         let page = parseInt(req.query.page) || 1;
-//         let sortQuery = {};
-
-//         // Validate page number to prevent out-of-range errors
-//         if (page < 1) {
-//             page = 1;
-//         }
-
-//         // Calculate total number of products
-//         const totalpdts = await productModel.countDocuments({});
-//         // Calculate total number of pages
-//         const totalPage = Math.ceil(totalpdts / perPage);
-
-//         switch (sortby) {
-//             case 'name_az':
-//                 sortQuery = { pname: 1 };
-//                 break;
-//             case 'name_za':
-//                 sortQuery = { pname: -1 };
-//                 break;
-//             case 'price_low_high':
-//                 sortQuery = { offprice: 1 };
-//                 break;
-//             case 'price_high_low':
-//                 sortQuery = { offprice: -1 };
-//                 break;
-//             case 'rating_lowest':
-//                 sortQuery = { rating: 1 };
-//                 break;
-//             default:
-//                 sortQuery = { all: -1 }; // Setting a default sorting option
-//                 break;
-//         }
-
-//         let productData;
-
-//         if (category) {
-//             // Fetch products based on category, pagination, and sorting
-//             productData = await productModel.find({ category: category })
-//                 .sort(sortQuery)
-//                 .skip(perPage * (page - 1))
-//                 .limit(perPage);
-//         } else {
-//             // Fetch products based on pagination and sorting
-//             productData = await productModel.find({})
-//                 .sort(sortQuery)
-//                 .skip(perPage * (page - 1))
-//                 .limit(perPage);
-//         }
-
-//         // Fetch user and category data
-//         const userData = req.session.user ? await User.findById(req.session.user) : null;
-//         const categoryData = await categoryModel.find({});
-
-//         // Fetch wishlist data if user is logged in
-//         let findWish = {};
-//         if (req.session.user && req.session.user._id) {
-//             const wishlistData = await Wishlist.findOne({ user_id: req.session.user._id });
-//             if (wishlistData) {
-//                 for (let i = 0; i < productData.length; i++) {
-//                     findWish[productData[i]._id] = wishlistData.products.some(p => p.productId.equals(productData[i]._id));
-//                 }
-//             }
-//         }
-
-//         for (let i = 0; i < productData.length; i++) {
-//             const product = productData[i];
-//             let offerPrice = product.offprice; // Initialize offer price with original price
-//             let discountPercentage = product.discountPercentage; // Initialize discount percentage with original value
-//             if (categoryData && categoryData.length > 0 && product.category) {
-//                 const category = categoryData.find(cat => cat._id.toString() === product.category.toString());
-//                 if (category && category.offer && new Date(category.offer.startDate) <= new Date() && new Date(category.offer.endDate) >= new Date()) {
-//                     const productPrice = product.price;
-//                     const productDiscountPercentage = product.discountPercentage;
-//                     const categoryDiscount = category.offer.discount;
-//                     const maxDiscount = Math.max(productDiscountPercentage, categoryDiscount);
-//                     offerPrice = productPrice - (productPrice * maxDiscount / 100);
-//                     discountPercentage = maxDiscount;
-//                 }
-//             }
-
-//             productData[i].offprice = offerPrice;
-        
-//         }
-
-
-//       const categories = await categoryModel.find({ is_blocked: false });
-//         res.render('shop', { user: userData, product: productData, category: categoryData,categories, page, totalPage, sortby, findWish, selectedCategory: req.query.category  });
-
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).send("Internal Server Error");
-//     }
-// };
 const loadshop = async (req, res) => {
     try {
         const sortby = req.query.sortby || null;
@@ -781,13 +727,16 @@ module.exports = {
     loaduserprofile,
     editProfile,
     addAddress,
+    loadForgotPassword,
     loadresetpassword,
+    forgotPassword,
     editAddress,
     deleteAddress,
     renderEditAddress,
     loadshop,
     addToWallet,
-    loadInvoice
+    loadInvoice,
+    resetpassword
     
     
     
