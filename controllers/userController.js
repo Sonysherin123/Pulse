@@ -46,7 +46,7 @@ const loadLogin = async(req,res)=>{
         console.log(error.message);
     }
 }
-console.log(error.message)
+    
 
 
 
